@@ -1,6 +1,6 @@
 # Demac Flavoured vagrant-lamp
 
-# Goal
+### Goal
 The goal of this project is to create an easy to use, reliable development environment.
 This was built as a MAMP/WAMP replacement, meeting the requirements of Magento 1 & 2
 specifically.
