@@ -1,36 +1,32 @@
 #!/usr/bin/env bash
 
-# Run this as sudo!
-# I move this file to /usr/local/bin/vhost and run command 'vhost' from anywhere, using sudo.
-
 #
 #   Show Usage, Output to STDERR
 #
 function show_usage {
 cat <<- _EOF_
 
-Create a new vHost in Ubuntu Server
-Assumes /etc/apache2/sites-available and /etc/apache2/sites-enabled setup used
+Create or Remove vHost in Ubuntu Server
+Assumes PHP-FPM with proxy_fcgi and /etc/apache2/sites-available and /etc/apache2/sites-enabled setup are used
 
-    -d    DocumentRoot - i.e. /var/www/yoursite
-    -h    Help - Show this menu.
-    -s    ServerName - i.e. example.com or sub.example.com
-    -a    ServerAlias - i.e. *.example.com or another domain altogether
-    -p    PHP Version - i.e. 5.4, 5.5, 5.6 or 7
-    -s    File path to the SSL certificate. Directories only, no file name.
-          If using an SSL Certificate, also creates a port :443 vhost as well.
-          This *ASSUMES* a .crt and a .key file exists
-            at file path /provided-file-path/your-server-or-cert-name.[crt|key].
-          Otherwise you can except Apache errors when you reload Apache.
-          Ensure Apache's mod_ssl is enabled via "sudo a2enmod ssl".
-    -c    Certificate filename. "example.com" becomes "example.com.key" and "example.com.crt".
-
-    sudo vhost -d /srv/www/example.com -s www.example.com -p 5.6
+Usage: vhost add|remove -d DocumentRoot -n ServerName -p PhpVersion [-a ServerAlias] [-s CertPath] [-c CertName]
+Options:
+  -d DocumentRoot    : DocumentRoot i.e. /var/www/yoursite
+  -h Help            : Show this menu.
+  -n ServerName      : Domain i.e. example.com or sub.example.com or 'js.example.com static.example.com'
+  -a ServerAlias     : Alias i.e. *.example.com or another domain altogether OPTIONAL
+  -p PHPVersion      : PHP Version i.e. 5.4, 5.5, 5.6 or 7
+  -s CertPAth        : File path to the SSL certificate. Directories only, no file name. OPTIONAL
+                       If using an SSL Certificate, also creates a port :443 vhost as well.
+                       This *ASSUMES* a .crt and a .key file exists
+                       at file path /provided-file-path/your-server-or-cert-name.[crt|key].
+                       Otherwise you can except Apache errors when you reload Apache.
+                       Ensure Apache's mod_ssl is enabled via "sudo a2enmod ssl".
+  -c CertName        : Certificate Name "example.com" becomes "example.com.key" and "example.com.crt". OPTIONAL
 
 _EOF_
 exit 1
 }
-
 
 #
 #   Output vHost skeleton, fill with userinput
@@ -119,15 +115,108 @@ cat <<- _EOF_
 _EOF_
 }
 
-#Sanity Check - are there two arguments with 2 values?
-if [ "$#" -lt 4 ]; then
-    show_usage
-fi
+function confirm () {
+    # call with a prompt string or use a default
+    read -r -p "${1:-Are you sure? [y/N]} " response
+    case ${response} in
+        [yY][eE][sS]|[yY])
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
 
+function add_vhost {
+
+    # If alias is set:
+    if [ "$Alias" != "" ]; then
+        ServerAlias="ServerAlias "$Alias
+    fi
+
+    # If CertName doesn't get set, set it to ServerName
+    if [ "$CertName" == "" ]; then
+        CertName=$ServerName
+    fi
+
+    if [ ! -d $DocumentRoot ]; then
+        mkdir -p $DocumentRoot
+        #chown USER:USER $DocumentRoot #POSSIBLE IMPLEMENTATION, new flag -u ?
+    fi
+
+    create_vhost > /etc/apache2/sites-available/${ServerName}.conf
+
+    # Add :443 handling
+    if [ "$CertPath" != "" ]; then
+        create_ssl_vhost >> /etc/apache2/sites-available/${ServerName}.conf
+    fi
+
+    # Enable Site
+    cd /etc/apache2/sites-available/ && a2ensite ${ServerName}.conf
+
+    # Add entry to hosts
+    if ! grep -q "127.0.0.1 $ServerName" /etc/hosts ; then
+      echo "127.0.0.1 $ServerName" >> /etc/hosts
+    fi
+    service apache2 reload
+}
+
+function remove_vhost {
+    if [ ! -f "/etc/apache2/sites-available/$ServerName.conf" ]; then
+        echo "vHost $ServerName not found. Aborting"
+        show_usage
+    fi
+    if [ -f "/etc/apache2/sites-enabled/$ServerName.conf" ]; then
+        cd /etc/apache2/sites-available/ && a2dissite ${ServerName}.conf
+    fi
+    rm /etc/apache2/sites-available/${ServerName}.conf
+    service apache2 reload
+}
+
+function parse_php_version {
+    case ${PhpVersion} in
+        5.4)
+            PhpPort=9004
+            ;;
+        5.5)
+            PhpPort=9005
+            ;;
+        5.6)
+            PhpPort=9006
+            ;;
+        7)
+            PhpPort=9007
+            ;;
+        *)
+            echo 'Invalid PHP Version. Aborting'
+            show_usage
+            ;;
+    esac
+}
+
+# Set Defaults
 CertPath=""
-PhpVersion=5.4
+ServerAlias=""
+
+# Transform long options to short ones
+for arg in "$@"; do
+  case "$arg" in
+    "add")
+        shift
+        set -- "$@" "-A"
+        ;;
+    "remove")
+        shift
+        set -- "$@" "-R"
+        ;;
+     *)
+        set -- "$@" "$arg"
+  esac
+done
+
 #Parse flags
-while getopts "d:s:a:p:c:h" OPTION; do
+while getopts "d:s:a:p:n:c:h:AR" OPTION; do
     case $OPTION in
         h)
             show_usage
@@ -135,7 +224,7 @@ while getopts "d:s:a:p:c:h" OPTION; do
         d)
             DocumentRoot=$OPTARG
             ;;
-        s)
+        n)
             ServerName=$OPTARG
             ;;
         a)
@@ -150,66 +239,40 @@ while getopts "d:s:a:p:c:h" OPTION; do
         c)
             CertName=$OPTARG
             ;;
+        A)
+            Task="add"
+            ;;
+        R)
+            Task="remove"
+            ;;
         *)
             show_usage
             ;;
     esac
 done
 
-# If alias is set:
-if [ "$Alias" != "" ]; then
-    ServerAlias="ServerAlias "$Alias
-else
-    ServerAlias=""
-fi
-
-# If CertName doesn't get set, set it to ServerName
-if [ "$CertName" == "" ]; then
-    CertName=$ServerName
-fi
-
-# If DocumentRoot doesn't get set, abort
-if [ "$DocumentRoot" == "" ]; then
-    echo 'DocumentRoot must be set. Aborting'
-    show_usage
-fi
-
-if [ ! -d $DocumentRoot ]; then
-    mkdir -p $DocumentRoot
-    #chown USER:USER $DocumentRoot #POSSIBLE IMPLEMENTATION, new flag -u ?
-fi
-
-case ${PhpVersion} in
-    5.4)
-        PhpPort=9004
-        ;;
-    5.5)
-        PhpPort=9005
-        ;;
-    5.6)
-        PhpPort=9006
-        ;;
-    7)
-        PhpPort=9007
-        ;;
-    *)
-        echo 'Invalid PHP Version. Aborting'
+if [ "$Task" = "add" ] ; then
+	if [ "$ServerName" = "" ] ; then
+        echo "Missing Server Name!! Aborting "
+		show_usage
+    elif [ "$DocumentRoot" == "" ]; then
+        echo 'DocumentRoot must be set!! Aborting'
         show_usage
-        ;;
-esac
-
-if [ -f "$DocumentRoot/$ServerName.conf" ]; then
-    echo 'vHost already exists. Aborting'
-    show_usage
-else
-    create_vhost > /etc/apache2/sites-available/${ServerName}.conf
-
-    # Add :443 handling
-    if [ "$CertPath" != "" ]; then
-        create_ssl_vhost >> /etc/apache2/sites-available/${ServerName}.conf
+    elif [ -f "/etc/apache2/sites-available/$ServerName.conf" ]; then
+        if confirm "vHost $ServerName already exists. Remove and Recreate? [y/N]" ; then
+            remove_vhost
+        else
+            exit 1
+        fi
     fi
-
-    # Enable Site
-    cd /etc/apache2/sites-available/ && a2ensite ${ServerName}.conf
-    service apache2 reload
+    parse_php_version
+    add_vhost
+elif [ "$Task" = "remove" ] ; then
+    if [ "$ServerName" = "" ] ; then
+        echo "Missing Server Name!! Aborting "
+		show_usage
+    fi
+    confirm "Remove vHost $ServerName? [y/N]" && remove_vhost
+else
+	show_usage
 fi

@@ -91,3 +91,6 @@ fi
 if ! grep -q "phpfarm" /etc/environment ; then
     echo "PATH="$PATH:/opt/phpfarm/inst/bin:/opt/phpfarm/inst/current/bin:/opt/phpfarm/inst/current/sbin"" >> /etc/environment
 fi
+
+#set Default Php
+/opt/phpfarm/inst/bin/switch-phpfarm 5.6.20
