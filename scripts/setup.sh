@@ -57,6 +57,13 @@ if [ ! -f /usr/local/bin/n98 ]; then
     mv n98-magerun.phar /usr/local/bin/n98
 fi
 
+# Setup n98-magerun
+if [ ! -f /usr/local/bin/modman ]; then
+    cd /tmp
+    bash < <(curl -s -L https://raw.github.com/colinmollenhour/modman/master/modman-installer)
+    mv ~/bin/modman /usr/local/bin/modman
+fi
+
 # Restart Services
 service apache2 restart
 service varnish restart

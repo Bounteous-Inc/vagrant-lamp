@@ -65,9 +65,10 @@ specifically.
 ####The following Extra Tools are available:
 -   Composer (Added to PATH)
 -   N98-Magerun (Added to PATH)
+-   modman (Added to PATH)
 -   redis-setup (Added to PATH)
     - Add,Remove or List Redis instances
         ```Usage: redis-setup add|remove|list -n name [-p port] [-s save]```
 -   vhost (Added to PATH)
-    - Add,Remove or List Redis instances
+    - Add,Remove Apache virtualhost entries
         ```Usage: vhost add|remove -d DocumentRoot -n ServerName -p PhpVersion [-a ServerAlias] [-s CertPath] [-c CertName]```
