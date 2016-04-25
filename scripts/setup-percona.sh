@@ -14,4 +14,5 @@ if [ ! -f /etc/mysql/my.cnf ]; then
     apt-get install -y percona-server-server-5.6 percona-server-client-5.6
     sed -i "s/bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
     service mysql restart
+    mysql --user="root" --password="root" --execute="GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root';"
 fi
