@@ -8,20 +8,23 @@ apt-get update
 # Install git
 apt-get install -y git
 
-# Setup Apache
-bash /vagrant/scripts/setup-apache.sh
-
-# Setup HTOP
+# Install HTOP
 apt-get install -y htop
 
-# Setup Redis
-bash /vagrant/scripts/setup-redis.sh
+# Install smem
+apt-get install -y smem
 
-# Setup Varnish
-bash /vagrant/scripts/setup-varnish.sh
+# Install strace
+apt-get install -y strace
 
-# Setup Percona
-bash /vagrant/scripts/setup-percona.sh
+# Install lynx
+apt-get install -y lynx
+
+# Install dos2unix
+apt-get install -y dos2unix
+
+# Correct non Unix lind endings
+find /vagrant/files -type f -exec dos2unix {} \;
 
 # Setup Hosts file
 while IFS='' read -r line || [[ -n "$line" ]]; do
@@ -39,36 +42,4 @@ apt-get install -y  build-essential libbz2-dev libmysqlclient-dev libxpm-dev lib
 if ! grep -q "^#Defaults[[:blank:]]*secure_path" /etc/sudoers ; then
     sed -i 's/^Defaults[[:blank:]]*secure_path/#Defaults       secure_path/' /etc/sudoers
 fi
-
-# Setup PHP w/ xdebug
-bash /vagrant/scripts/setup-php.sh
-
-# Setup Composer
-if [ ! -f /usr/local/bin/composer ]; then
-    cd /tmp
-    curl -sS https://getcomposer.org/installer | /opt/phpfarm/inst/php-5.4.45/bin/php
-    mv composer.phar /usr/local/bin/composer
-fi
-
-# Setup n98-magerun
-if [ ! -f /usr/local/bin/n98 ]; then
-    cd /tmp
-    wget --progress=bar:force https://files.magerun.net/n98-magerun.phar
-    mv n98-magerun.phar /usr/local/bin/n98
-fi
-
-# Setup n98-magerun
-if [ ! -f /usr/local/bin/modman ]; then
-    cd /tmp
-    bash < <(curl -s -L https://raw.github.com/colinmollenhour/modman/master/modman-installer)
-    mv ~/bin/modman /usr/local/bin/modman
-fi
-
-# Restart Services
-service apache2 restart
-service varnish restart
-service php-5.4 restart
-service php-5.5 restart
-service php-5.6 restart
-service php-7 restart
 

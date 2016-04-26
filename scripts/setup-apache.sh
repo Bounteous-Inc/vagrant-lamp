@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
+# Enable trace printing and exit on the first error
+set -ex
+
 # Setup Apache
 apt-get install -y apache2
 a2dismod mpm_prefork mpm_worker
-a2dismod php5
 a2enmod rewrite actions ssl
 a2enmod proxy_fcgi
 

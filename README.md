@@ -60,6 +60,10 @@ specifically.
 -   Redis
 -   PHP-FPM 5.4, 5.5, 5.6 & 7.0 /w Xdebug (via PHPFARM)
 -   HTOP
+-   dos2unix
+-   smem
+-   strace
+-   lynx
 
 
 ####The following Extra Tools are available:

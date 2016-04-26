@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Enable trace printing and exit on the first error
+set -ex
+
 # Setup Varnish
 apt-get install -y varnish
 sed -i.bak 's/.port = "8080";$/.port = "8090";/' /etc/varnish/default.vcl

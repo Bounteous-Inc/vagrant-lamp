@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+
+# Enable trace printing and exit on the first error
+set -ex
+
 function setup_xdebug() {
     cd /usr/lib
     if [ -d /usr/lib/xdebug ]; then
@@ -77,6 +81,9 @@ if [ ! -f /opt/phpfarm/inst/php-7.0.5/bin/php ]; then
     cd /opt/phpfarm/src
     ./main.sh 7.0.5
     setup_xdebug 7.0.5
+fi
+if [ ! -f /opt/phpfarm/inst/php-7.0.5/etc/php-fpm.conf ]; then
+    cp /opt/phpfarm/inst/php-7.0.5/etc/php-fpm.conf.default /opt/phpfarm/inst/php-7.0.5/etc/php-fpm.conf
 fi
 if [ ! -f /opt/phpfarm/inst/php-7.0.5/etc/php-fpm.d/www.conf ]; then
     cp /vagrant/files/php-fpm-7.conf /opt/phpfarm/inst/php-7.0.5/etc/php-fpm.d/www.conf
