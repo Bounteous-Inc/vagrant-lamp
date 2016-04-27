@@ -19,3 +19,7 @@ if [ ! -f /etc/mysql/my.cnf ]; then
     service mysql restart
     mysql --user="root" --password="root" --execute="GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root';"
 fi
+
+#setup redis script
+yes | cp -rf /vagrant/files/mysql-sync.sh /usr/local/bin/mysql-sync
+chmod +x /usr/local/bin/mysql-sync

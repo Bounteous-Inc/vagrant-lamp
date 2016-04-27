@@ -72,7 +72,13 @@ specifically.
 -   modman (Added to PATH)
 -   redis-setup (Added to PATH)
     - Add,Remove or List Redis instances
+
         ```Usage: redis-setup add|remove|list -n name [-p port] [-s save]```
 -   vhost (Added to PATH)
     - Add,Remove Apache virtualhost entries
+
         ```Usage: vhost add|remove -d DocumentRoot -n ServerName -p PhpVersion [-a ServerAlias] [-s CertPath] [-c CertName]```
+-   mysql-sync (Added to PATH)
+    - Sync Remote Database to VM Mysql instance
+
+        ```Usage: mysql-sync -i remote-ip -p remote-port -u remote-username -d remote-database```
