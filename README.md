@@ -70,6 +70,7 @@ specifically.
 -   Composer (Added to PATH)
 -   N98-Magerun (Added to PATH)
 -   modman (Added to PATH)
+-   PHPUnit (Added to PATH)
 -   redis-setup (Added to PATH)
     - Add,Remove or List Redis instances
 
