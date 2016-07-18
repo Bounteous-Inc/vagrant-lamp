@@ -4,7 +4,7 @@
 set -ex
 
 # Setup Percona
-if [ ! -f /etc/mysql/my.cnf ]; then
+if [ ! -f /etc/init.d/mysql* ]; then
     gpg --keyserver  hkp://keys.gnupg.net --recv-keys 1C4CBDCDCD2EFD2A
     gpg -a --export CD2EFD2A | sudo apt-key add -
     if ! grep -q "http://repo.percona.com/apt trusty main" /etc/apt/sources.list /etc/apt/sources.list.d/*; then

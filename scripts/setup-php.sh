@@ -34,8 +34,7 @@ if [ ! -f /opt/phpfarm/inst/php-5.4.45/bin/php ]; then
     cd /opt/phpfarm/src
     ./main.sh 5.4.45
     setup_xdebug 5.4.45
-    #PHP 5.4 uses lib instead of etc for php.ini
-    mv /opt/phpfarm/inst/php-5.4.45/etc/php.ini /opt/phpfarm/inst/php-5.4.45/lib/php.ini
+    cp /opt/phpfarm/inst/php-5.4.45/etc/php.ini /opt/phpfarm/inst/php-5.4.45/lib/php.ini
 fi
 if [ ! -f /opt/phpfarm/inst/php-5.4.45/etc/php-fpm.conf ]; then
     cp /vagrant/files/php-fpm-5.4.conf /opt/phpfarm/inst/php-5.4.45/etc/php-fpm.conf
@@ -51,6 +50,8 @@ if [ ! -f /opt/phpfarm/inst/php-5.5.34/bin/php ]; then
     cd /opt/phpfarm/src
     ./main.sh 5.5.34
     setup_xdebug 5.5.34
+    cp /opt/phpfarm/inst/php-5.5.34/etc/php.ini /opt/phpfarm/inst/php-5.5.34/lib/php.ini
+
 fi
 if [ ! -f /opt/phpfarm/inst/php-5.5.34/etc/php-fpm.conf ]; then
     cp /vagrant/files/php-fpm-5.5.conf /opt/phpfarm/inst/php-5.5.34/etc/php-fpm.conf
@@ -66,6 +67,7 @@ if [ ! -f /opt/phpfarm/inst/php-5.6.20/bin/php ]; then
     cd /opt/phpfarm/src
     ./main.sh 5.6.20
     setup_xdebug 5.6.20
+    cp /opt/phpfarm/inst/php-5.6.20/etc/php.ini /opt/phpfarm/inst/php-5.6.20/lib/php.ini
 fi
 if [ ! -f /opt/phpfarm/inst/php-5.6.20/etc/php-fpm.conf ]; then
     cp /vagrant/files/php-fpm-5.6.conf /opt/phpfarm/inst/php-5.6.20/etc/php-fpm.conf
@@ -77,16 +79,27 @@ if [ ! -f /etc/init.d/php-5.6 ]; then
 fi
 
 # PHP 7
-if [ ! -f /opt/phpfarm/inst/php-7.0.5/bin/php ]; then
+
+# Remove deprecated 7.0.5
+if [-f /opt/phpfarm/inst/php-7.0.5/bin/php ]; then
+    rm -Rf /opt/phpfarm/inst/php-7.0.5
+fi
+if [grep -q "php-7.0.5" /etc/init.d/php-7] ; then
+    rm /etc/init.d/php-7
+fi
+
+# Setup PHP 7.0.6
+if [ ! -f /opt/phpfarm/inst/php-7.0.6/bin/php ]; then
     cd /opt/phpfarm/src
-    ./main.sh 7.0.5
-    setup_xdebug 7.0.5
+    ./main.sh 7.0.6
+    setup_xdebug 7.0.6
+    cp /opt/phpfarm/inst/php-7.0.6/etc/php.ini /opt/phpfarm/inst/php-7.0.6/lib/php.ini
 fi
-if [ ! -f /opt/phpfarm/inst/php-7.0.5/etc/php-fpm.conf ]; then
-    cp /opt/phpfarm/inst/php-7.0.5/etc/php-fpm.conf.default /opt/phpfarm/inst/php-7.0.5/etc/php-fpm.conf
+if [ ! -f /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.conf ]; then
+    cp /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.conf.default /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.conf
 fi
-if [ ! -f /opt/phpfarm/inst/php-7.0.5/etc/php-fpm.d/www.conf ]; then
-    cp /vagrant/files/php-fpm-7.conf /opt/phpfarm/inst/php-7.0.5/etc/php-fpm.d/www.conf
+if [ ! -f /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.d/www.conf ]; then
+    cp /vagrant/files/php-fpm-7.conf /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.d/www.conf
 fi
 if [ ! -f /etc/init.d/php-7 ]; then
     cp /vagrant/files/php-init.d-7.sh /etc/init.d/php-7
