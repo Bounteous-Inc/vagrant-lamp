@@ -81,10 +81,10 @@ fi
 # PHP 7
 
 # Remove deprecated 7.0.5
-if [-f /opt/phpfarm/inst/php-7.0.5/bin/php ]; then
+if [ -f /opt/phpfarm/inst/php-7.0.5/bin/php ]; then
     rm -Rf /opt/phpfarm/inst/php-7.0.5
 fi
-if [grep -q "php-7.0.5" /etc/init.d/php-7] ; then
+if grep -q "php-7.0.5" /etc/init.d/php-7 ; then
     rm /etc/init.d/php-7
 fi
 
