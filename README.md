@@ -64,6 +64,7 @@ specifically.
 -   smem
 -   strace
 -   lynx
+-   mailhog
 
 
 ####The following Extra Tools are available:

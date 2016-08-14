@@ -50,7 +50,6 @@ Vagrant.configure(2) do |config|
     config.vm.synced_folder synced_folder['local_path'], synced_folder['destination'], options
   end
 
-
  # VirtualBox.
   config.vm.provider :virtualbox do |vb|
     vb.linked_clone = true if Vagrant::VERSION =~ /^1.8/
@@ -67,6 +66,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "setup_redis", type: "shell", path: "scripts/setup-redis.sh"
   config.vm.provision "setup_percona", type: "shell", path: "scripts/setup-percona.sh"
   config.vm.provision "setup_php", type: "shell", path: "scripts/setup-php.sh"
+  config.vm.provision "setup_mail", type: "shell", path: "scripts/setup-mail.sh"
   config.vm.provision "setup_tools", type: "shell", path: "scripts/setup-tools.sh"
   config.vm.provision "setup_finish", type: "shell", path: "scripts/setup-finish.sh"
 

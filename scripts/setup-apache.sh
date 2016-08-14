@@ -8,6 +8,7 @@ apt-get install -y apache2
 a2dismod mpm_prefork mpm_worker
 a2enmod rewrite actions ssl headers
 a2enmod proxy_fcgi
+a2enmod proxy_http
 
 #Change Listen Port
 sed -i.bak 's/Listen 80$/Listen 8090/' /etc/apache2/ports.conf
