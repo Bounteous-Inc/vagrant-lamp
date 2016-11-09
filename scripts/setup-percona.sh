@@ -5,12 +5,8 @@ set -ex
 
 # Setup Percona
 if [ ! -f /etc/init.d/mysql* ]; then
-    gpg --keyserver  hkp://keys.gnupg.net --recv-keys 1C4CBDCDCD2EFD2A
-    gpg -a --export CD2EFD2A | sudo apt-key add -
-    if ! grep -q "http://repo.percona.com/apt trusty main" /etc/apt/sources.list /etc/apt/sources.list.d/*; then
-        bash -c 'echo deb http://repo.percona.com/apt trusty main >> /etc/apt/sources.list'
-        bash -c 'echo deb-src http://repo.percona.com/apt trusty main >> /etc/apt/sources.list'
-    fi
+    wget https://repo.percona.com/apt/percona-release_0.1-4.$(lsb_release -sc)_all.deb
+    dpkg -i percona-release_0.1-4.$(lsb_release -sc)_all.deb
     apt-get update
     echo "percona-server-server-5.6 percona-server-server/root_password password root" | sudo debconf-set-selections
     echo "percona-server-server-5.6 percona-server-server/root_password_again password root" | sudo debconf-set-selections

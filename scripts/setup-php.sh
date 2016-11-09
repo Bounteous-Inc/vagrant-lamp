@@ -11,6 +11,9 @@ function setup_xdebug() {
     git clone git://github.com/xdebug/xdebug.git
     cd xdebug
 
+    if [[ $1 == *"5.4"* ]] ; then
+        git checkout xdebug_2_3
+    fi
     /opt/phpfarm/inst/php-$1/bin/phpize
     ./configure --with-php-config=/opt/phpfarm/inst/php-$1/bin/php-config
     make
