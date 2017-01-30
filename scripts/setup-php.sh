@@ -14,6 +14,15 @@ function setup_xdebug() {
     if [[ $1 == *"5.4"* ]] ; then
         git checkout xdebug_2_3
     fi
+
+    if [[ $1 == *"5.5"* ]] ; then
+        git checkout xdebug_2_4
+    fi
+
+    if [[ $1 == *"5.6"* ]] ; then
+        git checkout xdebug_2_5
+    fi
+
     /opt/phpfarm/inst/php-$1/bin/phpize
     ./configure --with-php-config=/opt/phpfarm/inst/php-$1/bin/php-config
     make
