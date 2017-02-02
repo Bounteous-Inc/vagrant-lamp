@@ -41,8 +41,6 @@ Vagrant.configure(2) do |config|
       rsync__exclude: synced_folder['excluded_paths'],
       rsync__args: ['--verbose', '--archive', '--delete', '-z', '--chmod=ugo=rwX'],
       id: synced_folder['id'],
-	  owner: "vagrant",
-	  group: "vagrant",
       create: synced_folder.include?('create') ? synced_folder['create'] : false,
       mount_options: synced_folder.include?('mount_options') ? synced_folder['mount_options'] : []
     }
