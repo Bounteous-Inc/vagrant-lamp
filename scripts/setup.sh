@@ -43,3 +43,5 @@ if ! grep -q "^#Defaults[[:blank:]]*secure_path" /etc/sudoers ; then
     sed -i 's/^Defaults[[:blank:]]*secure_path/#Defaults       secure_path/' /etc/sudoers
 fi
 
+# Add dialout group to vagrant user for NFS mounts
+usermod -a -G dialout vagrant
