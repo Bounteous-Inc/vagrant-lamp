@@ -3,11 +3,15 @@
 
 # Use config.yml for basic VM configuration.
 require 'yaml'
+require File.dirname(__FILE__)+"./files/dependency_manager"
 dir = File.dirname(File.expand_path(__FILE__))
 unless File.exist?("#{dir}/config.yml")
   raise 'Configuration file not found! Please copy example.config.yml to config.yml and try again.'
 end
 vconfig = YAML.load_file("#{dir}/config.yml")
+if !Vagrant::Util::Platform.windows?
+   check_plugins ["vagrant-bindfs"]
+end
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -47,7 +51,12 @@ Vagrant.configure(2) do |config|
     if synced_folder.include?('options_override')
       options = options.merge(synced_folder['options_override'])
     end
-    config.vm.synced_folder synced_folder['local_path'], synced_folder['destination'], options
+    if synced_folder['type'] == 'nfs' && !Vagrant::Util::Platform.windows?
+	  config.vm.synced_folder synced_folder['local_path'], '/nfs' + synced_folder['destination'], options
+	  config.bindfs.bind_folder "/nfs" + synced_folder['destination'], synced_folder['destination'], :owner => "vagrant", :group => "vagrant", :'create-as-user' => true, :perms => "u=rwx:g=rwx:o=r", :'create-with-perms' => "u=rwx:g=rwx:o=r", :'chown-ignore' => true, :'chgrp-ignore' => true, :'chmod-ignore' => true
+    else
+	  config.vm.synced_folder synced_folder['local_path'], synced_folder['destination'], options
+	end
   end
 
  # VirtualBox.
