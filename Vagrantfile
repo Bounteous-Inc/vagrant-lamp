@@ -3,7 +3,7 @@
 
 # Use config.yml for basic VM configuration.
 require 'yaml'
-require File.dirname(__FILE__)+"./files/dependency_manager"
+require File.dirname(__FILE__)+"/files/dependency_manager"
 dir = File.dirname(File.expand_path(__FILE__))
 unless File.exist?("#{dir}/config.yml")
   raise 'Configuration file not found! Please copy example.config.yml to config.yml and try again.'
