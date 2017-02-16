@@ -7,15 +7,14 @@ function show_usage {
 cat <<- _EOF_
 
 Create or Remove vHost in Ubuntu Server
-Assumes PHP-FPM with proxy_fcgi and /etc/apache2/sites-available and /etc/apache2/sites-enabled setup are used
+Assumes /etc/apache2/sites-available and /etc/apache2/sites-enabled setup are used
 
-Usage: vhost add|remove -d DocumentRoot -n ServerName -p PhpVersion [-a ServerAlias] [-s CertPath] [-c CertName]
+Usage: vhost add|remove -d DocumentRoot -n ServerName [-a ServerAlias] [-s CertPath] [-c CertName]
 Options:
   -d DocumentRoot    : DocumentRoot i.e. /var/www/yoursite
   -h Help            : Show this menu.
   -n ServerName      : Domain i.e. example.com or sub.example.com or 'js.example.com static.example.com'
   -a ServerAlias     : Alias i.e. *.example.com or another domain altogether OPTIONAL
-  -p PHPVersion      : PHP Version i.e. 5.4, 5.5, 5.6 or 7
   -s CertPAth        : File path to the SSL certificate. Directories only, no file name. OPTIONAL
                        If using an SSL Certificate, also creates a port :443 vhost as well.
                        This *ASSUMES* a .crt and a .key file exists
@@ -39,19 +38,17 @@ cat <<- _EOF_
     ServerName $ServerName
     $ServerAlias
 
+    RailsEnv development
     DocumentRoot $DocumentRoot
 
-    # PHP proxy specifications
-    <Proxy fcgi://127.0.0.1:$PhpPort>
-        ProxySet timeout=1800
-    </Proxy>
-
-    ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:$PhpPort$DocumentRoot/\$1
-
     <Directory $DocumentRoot>
-        Options -Indexes +FollowSymLinks +MultiViews
-        AllowOverride All
-        Require all granted
+       Require all granted
+	    Options FollowSymLinks
+	    # This relaxes Apache security settings.
+	    AllowOverride None
+	    # MultiViews must be turned off.
+	    Order allow,deny
+	    Allow from all
     </Directory>
 
     ErrorLog \${APACHE_LOG_DIR}/$ServerName-error.log
@@ -74,19 +71,17 @@ cat <<- _EOF_
     ServerName $ServerName
     $ServerAlias
 
-    # PHP proxy specifications
-    <Proxy fcgi://127.0.0.1:$PhpPort>
-        ProxySet timeout=1800
-    </Proxy>
-
-    ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:$PhpPort$DocumentRoot/\$1
-
+    RailsEnv development
     DocumentRoot $DocumentRoot
 
     <Directory $DocumentRoot>
-        Options -Indexes +FollowSymLinks +MultiViews
-        AllowOverride All
         Require all granted
+	    Options FollowSymLinks
+	    # This relaxes Apache security settings.
+	    AllowOverride None
+	    # MultiViews must be turned off.
+	    Order allow,deny
+	    Allow from all
     </Directory>
 
     ErrorLog \${APACHE_LOG_DIR}/$ServerName-error.log
@@ -101,10 +96,6 @@ cat <<- _EOF_
 
     SSLCertificateFile  $CertPath/$CertName.crt
     SSLCertificateKeyFile $CertPath/$CertName.key
-
-    <FilesMatch "\.(cgi|shtml|phtml|php)$">
-        SSLOptions +StdEnvVars
-    </FilesMatch>
 
     BrowserMatch "MSIE [2-6]" \\
         nokeepalive ssl-unclean-shutdown \\
@@ -174,27 +165,6 @@ function remove_vhost {
     service apache2 reload
 }
 
-function parse_php_version {
-    case ${PhpVersion} in
-        5.4)
-            PhpPort=9004
-            ;;
-        5.5)
-            PhpPort=9005
-            ;;
-        5.6)
-            PhpPort=9006
-            ;;
-        7)
-            PhpPort=9007
-            ;;
-        *)
-            echo 'Invalid PHP Version. Aborting'
-            show_usage
-            ;;
-    esac
-}
-
 # Set Defaults
 CertPath=""
 ServerAlias=""
@@ -216,7 +186,7 @@ for arg in "$@"; do
 done
 
 #Parse flags
-while getopts "d:s:a:p:n:c:h:AR" OPTION; do
+while getopts "d:s:a:n:c:h:AR" OPTION; do
     case $OPTION in
         h)
             show_usage
@@ -229,9 +199,6 @@ while getopts "d:s:a:p:n:c:h:AR" OPTION; do
             ;;
         a)
             Alias=$OPTARG
-            ;;
-        p)
-            PhpVersion=$OPTARG
             ;;
         s)
             CertPath=$OPTARG
@@ -265,7 +232,6 @@ if [ "$Task" = "add" ] ; then
             exit 1
         fi
     fi
-    parse_php_version
     add_vhost
 elif [ "$Task" = "remove" ] ; then
     if [ "$ServerName" = "" ] ; then

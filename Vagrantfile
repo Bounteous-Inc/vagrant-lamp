@@ -37,6 +37,8 @@ Vagrant.configure(2) do |config|
     config.vm.network :public_network, ip: vconfig['vagrant_public_ip']
   end
 
+  config.vm.network "forwarded_port", guest: 27017, host: 27017
+
  # Synced folders.
   vconfig['vagrant_synced_folders'].each do |synced_folder|
     options = {
@@ -50,7 +52,7 @@ Vagrant.configure(2) do |config|
     }
     if synced_folder.include?('options_override')
       options = options.merge(synced_folder['options_override'])
-    end
+    end	
     if synced_folder['type'] == 'nfs' && !Vagrant::Util::Platform.windows?
 	  config.vm.synced_folder synced_folder['local_path'], '/nfs' + synced_folder['destination'], options
 	  config.bindfs.bind_folder "/nfs" + synced_folder['destination'], synced_folder['destination'], :owner => "vagrant", :group => "vagrant", :'create-as-user' => true, :perms => "u=rwx:g=rwx:o=r", :'create-with-perms' => "u=rwx:g=rwx:o=r", :'chown-ignore' => true, :'chgrp-ignore' => true, :'chmod-ignore' => true
@@ -73,9 +75,12 @@ Vagrant.configure(2) do |config|
   config.vm.provision "setup_apache", type: "shell", path: "scripts/setup-apache.sh"
   config.vm.provision "setup_varnish", type: "shell", path: "scripts/setup-varnish.sh"
   config.vm.provision "setup_redis", type: "shell", path: "scripts/setup-redis.sh"
-  config.vm.provision "setup_percona", type: "shell", path: "scripts/setup-percona.sh"
-  config.vm.provision "setup_php", type: "shell", path: "scripts/setup-php.sh"
-  config.vm.provision "setup_mail", type: "shell", path: "scripts/setup-mail.sh"
+  config.vm.provision "setup_ruby", type: "shell",  privileged: false, path: "scripts/setup-ruby.sh", args: vconfig['weblinc_username'] + " " + vconfig['weblinc_password']
+  config.vm.provision "setup_phantomjs", type: "shell", path: "scripts/setup-phantomjs.sh"
+  config.vm.provision "setup_imagemagick", type: "shell", path: "scripts/setup-imagemagick.sh"
+  config.vm.provision "setup_mongodb", type: "shell", path: "scripts/setup-mongodb.sh"
+  config.vm.provision "setup_java", type: "shell", path: "scripts/setup-java.sh"
+  config.vm.provision "setup_elasticsearch", type: "shell", path: "scripts/setup-elasticsearch.sh"
   config.vm.provision "setup_tools", type: "shell", path: "scripts/setup-tools.sh"
   config.vm.provision "setup_finish", type: "shell", path: "scripts/setup-finish.sh"
 

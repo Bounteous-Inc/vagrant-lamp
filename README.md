@@ -2,8 +2,7 @@
 
 ### Goal
 The goal of this project is to create an easy to use, reliable development environment.
-This was built as a MAMP/WAMP replacement, meeting the requirements of Magento 1 & 2
-specifically.
+Built off the same ideas as the LAMP stack for Magento, this has been designed with Weblinc/Workarea in mind 
 
 ### Requirements
 
@@ -14,8 +13,8 @@ specifically.
 ### Setup
 
     # Install git and DemacMedia/Vagrant-Lamp
-    git clone https://github.com/DemacMedia/vagrant-lamp.git
-    cd vagrant-lamp
+    git clone -b RubyStack https://github.com/DemacMedia/vagrant-lamp.git vagrant-lamp-ruby
+    cd vagrant-lamp-ruby
 
     # Copy example.config.yml to config.yml and edit options
     cp example.config.yml config.yml
@@ -35,7 +34,7 @@ specifically.
     -   vagrant_synced_folders: Shared Folders from HOST machine to Guest
         -   local_path: Path on Host machine to share
         -   destination: Path on Guest machine to mount share
-        -   type: Share Type \[[nfs](https://www.vagrantup.com/docs/synced-folders/nfs.html)|[smb](https://www.vagrantup.com/docs/synced-folders/smb.html)|[rsync](https://www.vagrantup.com/docs/synced-folders/rsync.html)\] `OPTIONAL - recommended leave defualt empty`
+        -   type: Share Type \[[nfs](https://www.vagrantup.com/docs/synced-folders/nfs.html)|[smb](https://www.vagrantup.com/docs/synced-folders/smb.html)|[rsync](https://www.vagrantup.com/docs/synced-folders/rsync.html)\] `OPTIONAL - recommended  'nfs' for OSX and leave defualt/empty for Windows`
         -   create: Create directory on HOST machine if it doesn't exist `OPTIONAL - recommended leave defualt true`
         ```
         #Example of Multiple Shared Folders
@@ -51,36 +50,35 @@ specifically.
         ```
     -   vagrant_memory: Memory to assign to VM `OPTIONAL - can leave default 2048, recommended 3096`
     -   vagrant_cpus: CPU Cores to assign to VM `OPTIONAL - can leave default 2`
+    -   weblinc_username: Weblinc gem repo username
+    -   weblinc_password: Weblinc gem repo password
 
 ####The following are installed:
 
 -   Apache2 with mpm\_event
--   Percona 5.6 (Server and Client)
+-   Passenger for Apache Ruby/Rails integration
 -   Varnish
 -   Redis
--   PHP-FPM 5.4, 5.5, 5.6 & 7.0 /w Xdebug (via PHPFARM)
+-   Rbenv
+-   Ruby 2.3.1
+-   Open JDK 7
+-   ElasticSearch
+-   PhatomJs
+-   Mongo DB
+-   Imagemagick
 -   HTOP
 -   dos2unix
 -   smem
 -   strace
 -   lynx
--   mailhog
 
 
 ####The following Extra Tools are available:
--   Composer (Added to PATH)
--   N98-Magerun (Added to PATH)
--   modman (Added to PATH)
--   PHPUnit (Added to PATH)
 -   redis-setup (Added to PATH)
     - Add,Remove or List Redis instances
 
         ```Usage: redis-setup add|remove|list -n name [-p port] [-s save]```
--   vhost (Added to PATH)
+-   vhost (Added to PATH) *Ruby version
     - Add,Remove Apache virtualhost entries
 
-        ```Usage: vhost add|remove -d DocumentRoot -n ServerName -p PhpVersion [-a ServerAlias] [-s CertPath] [-c CertName]```
--   mysql-sync (Added to PATH)
-    - Sync Remote Database to VM Mysql instance
-
-        ```Usage: mysql-sync -i remote-ip -p remote-port -u remote-username -d remote-database```
+        ```Usage: vhost add|remove -d DocumentRoot -n ServerName [-a ServerAlias] [-s CertPath] [-c CertName]```

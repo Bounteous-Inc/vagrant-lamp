@@ -1,7 +1,7 @@
 ---
-vagrant_hostname: demacvm.dev
-vagrant_machine_name: demacvm
-vagrant_ip: 192.168.33.10
+vagrant_hostname: demacrvm.dev
+vagrant_machine_name: demacrvm
+vagrant_ip: 192.168.33.11
 
 # Allow VM to be accessed via a public network interface on your host.
 # Vagrant boxes are insecure by default, so be careful. You've been warned!
@@ -20,3 +20,6 @@ vagrant_synced_folders:
 # Memory and CPU to use for this VM.
 vagrant_memory: 2048
 vagrant_cpus: 2
+
+weblinc_username: ""
+weblinc_password: ""
