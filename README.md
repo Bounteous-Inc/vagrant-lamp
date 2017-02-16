@@ -24,12 +24,13 @@ Built off the same ideas as the LAMP stack for Magento, this has been designed w
     vagrant up
 
 ###Configuration
+-   ####\*NOTE\* Default vagrant IP is 192.168.33.11 to not conflict with the PHP Stack. This allows both versions to be installed and used.
 -   Guest Host Entries:
     -   Add host entries to files/hosts.txt to have them added to Guest machine on provisioning
 -   config.yml settings
-    -   vagrant_hostname: Hostname on Guest VM `OPTIONAL - can leave default demacvm.dev`
-    -   vagrant_machine_name: Vagrant Machine Name, used for creating unique VM `OPTIONAL - can leave default demacvm`
-    -   vagrant_ip: IP addressed used to access Guest VM from Local machine `OPTIONAL - can leave default 192.168.33.10`
+    -   vagrant_hostname: Hostname on Guest VM `OPTIONAL - can leave default demacrvm.dev`
+    -   vagrant_machine_name: Vagrant Machine Name, used for creating unique VM `OPTIONAL - can leave default demacrvm`
+    -   vagrant_ip: IP addressed used to access Guest VM from Local machine `OPTIONAL - can leave default 192.168.33.11`
     -   vagrant_public_ip: Public IP address of VM `OPTIONAL - recommended leave defualt empty`
     -   vagrant_synced_folders: Shared Folders from HOST machine to Guest
         -   local_path: Path on Host machine to share
