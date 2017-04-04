@@ -17,5 +17,5 @@ sed -i.bak 's/Listen 80$/Listen 8090/' /etc/apache2/ports.conf
 sed -i.bak 's/www-data$/vagrant/' /etc/apache2/envvars
 
 # Setup VHOST Script
-yes | cp -rf /vagrant/files/vhost.sh /usr/local/bin/vhost
+yes | cp -rf /vagrant/files/vhost-ruby.sh /usr/local/bin/vhost
 chmod +x /usr/local/bin/vhost

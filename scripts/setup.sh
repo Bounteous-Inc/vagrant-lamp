@@ -34,7 +34,7 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
 done </vagrant/files/hosts.txt
 
 #Setup PHP compile pre-requisites
-apt-get install -y  build-essential libbz2-dev libmysqlclient-dev libxpm-dev libmcrypt-dev \
+apt-get install -y  build-essential libbz2-dev libxpm-dev libmcrypt-dev \
     libcurl4-gnutls-dev libxml2-dev libjpeg-dev libpng12-dev libssl-dev pkg-config libreadline-dev \
     curl autoconf libicu-dev libxslt-dev
 
@@ -42,3 +42,4 @@ apt-get install -y  build-essential libbz2-dev libmysqlclient-dev libxpm-dev lib
 if ! grep -q "^#Defaults[[:blank:]]*secure_path" /etc/sudoers ; then
     sed -i 's/^Defaults[[:blank:]]*secure_path/#Defaults       secure_path/' /etc/sudoers
 fi
+
