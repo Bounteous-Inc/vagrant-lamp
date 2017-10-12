@@ -100,18 +100,18 @@ if grep -q "php-7.0.5" /etc/init.d/php-7 ; then
     rm /etc/init.d/php-7
 fi
 
-# Setup PHP 7.0.6
-if [ ! -f /opt/phpfarm/inst/php-7.0.6/bin/php ]; then
+# Setup PHP 7.0.8
+if [ ! -f /opt/phpfarm/inst/php-7.0.8/bin/php ]; then
     cd /opt/phpfarm/src
-    ./main.sh 7.0.6
-    setup_xdebug 7.0.6
-    cp /opt/phpfarm/inst/php-7.0.6/etc/php.ini /opt/phpfarm/inst/php-7.0.6/lib/php.ini
+    ./main.sh 7.0.8
+    setup_xdebug 7.0.8
+    cp /opt/phpfarm/inst/php-7.0.8/etc/php.ini /opt/phpfarm/inst/php-7.0.8/lib/php.ini
 fi
-if [ ! -f /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.conf ]; then
-    cp /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.conf.default /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.conf
+if [ ! -f /opt/phpfarm/inst/php-7.0.8/etc/php-fpm.conf ]; then
+    cp /opt/phpfarm/inst/php-7.0.8/etc/php-fpm.conf.default /opt/phpfarm/inst/php-7.0.8/etc/php-fpm.conf
 fi
-if [ ! -f /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.d/www.conf ]; then
-    cp /vagrant/files/php-fpm-7.conf /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.d/www.conf
+if [ ! -f /opt/phpfarm/inst/php-7.0.8/etc/php-fpm.d/www.conf ]; then
+    cp /vagrant/files/php-fpm-7.conf /opt/phpfarm/inst/php-7.0.8/etc/php-fpm.d/www.conf
 fi
 if [ ! -f /etc/init.d/php-7 ]; then
     cp /vagrant/files/php-init.d-7.sh /etc/init.d/php-7

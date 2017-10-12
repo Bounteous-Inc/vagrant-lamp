@@ -14,7 +14,7 @@ specifically.
 ### Setup
 
     # Install git and DemacMedia/Vagrant-Lamp
-    git clone https://github.com/DemacMedia/vagrant-lamp.git
+    git clone https://github.com/mbrzuzy/vagrant-lamp.git
     cd vagrant-lamp
 
     # Copy example.config.yml to config.yml and edit options
