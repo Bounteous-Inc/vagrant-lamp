@@ -19,7 +19,7 @@ if [ ! -f /usr/local/bin/n98 ]; then
     chmod +x /usr/local/bin/n98
 fi
 
-# Setup n98-magerun
+# Setup modman
 if [ ! -f /usr/local/bin/modman ]; then
     cd /tmp
     bash < <(curl -s -L https://raw.github.com/colinmollenhour/modman/master/modman-installer)

@@ -1,0 +1,8 @@
+--------------------------
+ Demac Vagrant Lamp 1.0.2
+--------------------------
+The following PHP versions are available with this release:
+  * PHP 5.6.20 (alias php5.6)
+  * PHP 7.0.7  (alias php7)
+  * PHP 7.1.12 (alias php7.1)
+

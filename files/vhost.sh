@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Version 1.0.1
+# Version 1.0.2
 #
 # Show Usage, Output to STDERR
 #
@@ -15,7 +15,7 @@ Options:
   -h Help            : Show this menu.
   -n ServerName      : Domain i.e. example.com or sub.example.com or 'js.example.com static.example.com'
   -a ServerAlias     : Alias i.e. *.example.com or another domain altogether OPTIONAL
-  -p PHPVersion      : PHP Version i.e. 5.4, 5.5, 5.6 or 7
+  -p PHPVersion      : PHP Version: choose one of 5.6, 7 or 7.1
   -s CertPath        : ***SELF SIGNED CERTIFICATE ARE AUTOMATICALLY CREATED FOR EACH VHOST USE THIS TO OVERRIDE***
                        File path to the SSL certificate. Directories only, no file name. OPTIONAL
                        If using an SSL Certificate, also creates a port :443 vhost as well.
@@ -214,17 +214,14 @@ function remove_vhost {
 
 function parse_php_version {
     case ${PhpVersion} in
-        5.4)
-            PhpPort=9004
-            ;;
-        5.5)
-            PhpPort=9005
-            ;;
         5.6)
             PhpPort=9006
             ;;
         7)
             PhpPort=9007
+            ;;
+        7.1)
+            PhpPort=9008
             ;;
         *)
             echo 'Invalid PHP Version. Aborting'

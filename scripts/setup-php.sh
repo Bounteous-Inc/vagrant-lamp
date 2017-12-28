@@ -11,14 +11,6 @@ function setup_xdebug() {
     git clone git://github.com/xdebug/xdebug.git
     cd xdebug
 
-    if [[ $1 == *"5.4"* ]] ; then
-        git checkout xdebug_2_3
-    fi
-
-    if [[ $1 == *"5.5"* ]] ; then
-        git checkout xdebug_2_4
-    fi
-
     if [[ $1 == *"5.6"* ]] ; then
         git checkout xdebug_2_5
     fi
@@ -41,38 +33,7 @@ if [ ! -d /opt/phpfarm ]; then
     git clone https://github.com/DemacMedia/phpfarm.git phpfarm
 fi
 
-# PHP 5.4
-if [ ! -f /opt/phpfarm/inst/php-5.4.45/bin/php ]; then
-    cd /opt/phpfarm/src
-    ./main.sh 5.4.45
-    setup_xdebug 5.4.45
-    cp /opt/phpfarm/inst/php-5.4.45/etc/php.ini /opt/phpfarm/inst/php-5.4.45/lib/php.ini
-fi
-if [ ! -f /opt/phpfarm/inst/php-5.4.45/etc/php-fpm.conf ]; then
-    cp /vagrant/files/php-fpm-5.4.conf /opt/phpfarm/inst/php-5.4.45/etc/php-fpm.conf
-fi
-if [ ! -f /etc/init.d/php-5.4 ]; then
-    cp /vagrant/files/php-init.d-5.4.sh /etc/init.d/php-5.4
-    chmod +x /etc/init.d/php-5.4
-    update-rc.d php-5.4 defaults
-fi
 
-# PHP 5.5
-if [ ! -f /opt/phpfarm/inst/php-5.5.34/bin/php ]; then
-    cd /opt/phpfarm/src
-    ./main.sh 5.5.34
-    setup_xdebug 5.5.34
-    cp /opt/phpfarm/inst/php-5.5.34/etc/php.ini /opt/phpfarm/inst/php-5.5.34/lib/php.ini
-
-fi
-if [ ! -f /opt/phpfarm/inst/php-5.5.34/etc/php-fpm.conf ]; then
-    cp /vagrant/files/php-fpm-5.5.conf /opt/phpfarm/inst/php-5.5.34/etc/php-fpm.conf
-fi
-if [ ! -f /etc/init.d/php-5.5 ]; then
-    cp /vagrant/files/php-init.d-5.5.sh /etc/init.d/php-5.5
-    chmod +x /etc/init.d/php-5.5
-    update-rc.d php-5.5 defaults
-fi
 
 # PHP 5.6
 if [ ! -f /opt/phpfarm/inst/php-5.6.20/bin/php ]; then
@@ -90,8 +51,9 @@ if [ ! -f /etc/init.d/php-5.6 ]; then
     update-rc.d php-5.6 defaults
 fi
 
-# PHP 7
 
+
+# PHP 7
 # Remove deprecated 7.0.5
 if [ -f /opt/phpfarm/inst/php-7.0.5/bin/php ]; then
     rm -Rf /opt/phpfarm/inst/php-7.0.5
@@ -101,23 +63,49 @@ if grep -q "php-7.0.5" /etc/init.d/php-7 ; then
 fi
 
 # Setup PHP 7.0.6
-if [ ! -f /opt/phpfarm/inst/php-7.0.6/bin/php ]; then
+phpv='7.0.6'
+if [ ! -f /opt/phpfarm/inst/php-${phpv}/bin/php ]; then
     cd /opt/phpfarm/src
-    ./main.sh 7.0.6
-    setup_xdebug 7.0.6
-    cp /opt/phpfarm/inst/php-7.0.6/etc/php.ini /opt/phpfarm/inst/php-7.0.6/lib/php.ini
+    ./main.sh ${phpv}
+    setup_xdebug ${phpv}
+    cp /opt/phpfarm/inst/php-${phpv}/etc/php.ini /opt/phpfarm/inst/php-${phpv}/lib/php.ini
 fi
-if [ ! -f /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.conf ]; then
-    cp /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.conf.default /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.conf
+if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf ]; then
+    cp /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf.default /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
 fi
-if [ ! -f /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.d/www.conf ]; then
-    cp /vagrant/files/php-fpm-7.conf /opt/phpfarm/inst/php-7.0.6/etc/php-fpm.d/www.conf
+if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf ]; then
+    cp /vagrant/files/php-fpm-7.conf /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf
 fi
 if [ ! -f /etc/init.d/php-7 ]; then
     cp /vagrant/files/php-init.d-7.sh /etc/init.d/php-7
     chmod +x /etc/init.d/php-7
     update-rc.d php-7 defaults
 fi
+
+
+
+# PHP 7.1
+phpv='7.1.12'
+if [ ! -f /opt/phpfarm/inst/php-${phpv}/bin/php ]; then
+    cd /opt/phpfarm/src
+    ./main.sh ${phpv}
+    setup_xdebug ${phpv}
+    cp /opt/phpfarm/inst/php-${phpv}/etc/php.ini /opt/phpfarm/inst/php-${phpv}/lib/php.ini
+fi
+if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf ]; then
+    cp /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf.default /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
+fi
+if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf ]; then
+    cp /vagrant/files/php-fpm-7.1.conf /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf
+fi
+if [ ! -f /etc/init.d/php-7.1 ]; then
+    cp /vagrant/files/php-init.d-7.1.sh /etc/init.d/php-7.1
+    chmod +x /etc/init.d/php-7.1
+    update-rc.d php-7.1 defaults
+fi
+
+
+
 
 # Add PHPFarm to PATH
 if ! grep -q "phpfarm" /etc/environment ; then
