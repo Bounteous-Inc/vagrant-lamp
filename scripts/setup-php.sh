@@ -3,6 +3,13 @@
 # Enable trace printing and exit on the first error
 set -ex
 
+php_versions=(
+#  'version    shortname  port'
+   '5.6.20     5.6        9006'
+   '7.0.6      7          9007'
+   '7.1.12     7.1        9008'
+)
+
 function setup_xdebug() {
     cd /usr/lib
     if [ -d /usr/lib/xdebug ]; then
@@ -34,26 +41,6 @@ if [ ! -d /opt/phpfarm ]; then
 fi
 
 
-
-# PHP 5.6
-if [ ! -f /opt/phpfarm/inst/php-5.6.20/bin/php ]; then
-    cd /opt/phpfarm/src
-    ./main.sh 5.6.20
-    setup_xdebug 5.6.20
-    cp /opt/phpfarm/inst/php-5.6.20/etc/php.ini /opt/phpfarm/inst/php-5.6.20/lib/php.ini
-fi
-if [ ! -f /opt/phpfarm/inst/php-5.6.20/etc/php-fpm.conf ]; then
-    cp /vagrant/files/php-fpm-5.6.conf /opt/phpfarm/inst/php-5.6.20/etc/php-fpm.conf
-fi
-if [ ! -f /etc/init.d/php-5.6 ]; then
-    cp /vagrant/files/php-init.d-5.6.sh /etc/init.d/php-5.6
-    chmod +x /etc/init.d/php-5.6
-    update-rc.d php-5.6 defaults
-fi
-
-
-
-# PHP 7
 # Remove deprecated 7.0.5
 if [ -f /opt/phpfarm/inst/php-7.0.5/bin/php ]; then
     rm -Rf /opt/phpfarm/inst/php-7.0.5
@@ -62,48 +49,49 @@ if grep -q "php-7.0.5" /etc/init.d/php-7 ; then
     rm /etc/init.d/php-7
 fi
 
-# Setup PHP 7.0.6
-phpv='7.0.6'
-if [ ! -f /opt/phpfarm/inst/php-${phpv}/bin/php ]; then
-    cd /opt/phpfarm/src
-    ./main.sh ${phpv}
-    setup_xdebug ${phpv}
-    cp /opt/phpfarm/inst/php-${phpv}/etc/php.ini /opt/phpfarm/inst/php-${phpv}/lib/php.ini
-fi
-if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf ]; then
-    cp /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf.default /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
-fi
-if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf ]; then
-    cp /vagrant/files/php-fpm-7.conf /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf
-fi
-if [ ! -f /etc/init.d/php-7 ]; then
-    cp /vagrant/files/php-init.d-7.sh /etc/init.d/php-7
-    chmod +x /etc/init.d/php-7
-    update-rc.d php-7 defaults
-fi
 
+for i in "${php_versions[@]}"; do
+    arr=(${i// / })
+    phpv=${arr[0]}
+    phpn=${arr[1]}
+    phpp=${arr[2]}
 
+    # Make aliases
+    phpa="alias php${phpn}='/opt/phpfarm/inst/php-${phpv}/bin/php'";
+    echo ${phpa} >> /home/vagrant/.bash_aliases;
+    echo ${phpa} >> /root/.bash_aliases;
 
-# PHP 7.1
-phpv='7.1.12'
-if [ ! -f /opt/phpfarm/inst/php-${phpv}/bin/php ]; then
-    cd /opt/phpfarm/src
-    ./main.sh ${phpv}
-    setup_xdebug ${phpv}
-    cp /opt/phpfarm/inst/php-${phpv}/etc/php.ini /opt/phpfarm/inst/php-${phpv}/lib/php.ini
-fi
-if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf ]; then
-    cp /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf.default /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
-fi
-if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf ]; then
-    cp /vagrant/files/php-fpm-7.1.conf /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf
-fi
-if [ ! -f /etc/init.d/php-7.1 ]; then
-    cp /vagrant/files/php-init.d-7.1.sh /etc/init.d/php-7.1
-    chmod +x /etc/init.d/php-7.1
-    update-rc.d php-7.1 defaults
-fi
-
+    if [ ! -f /opt/phpfarm/inst/php-${phpv}/bin/php ]; then
+        cd /opt/phpfarm/src
+        ./main.sh ${phpv}
+        setup_xdebug ${phpv}
+        cp /opt/phpfarm/inst/php-${phpv}/etc/php.ini /opt/phpfarm/inst/php-${phpv}/lib/php.ini
+    fi
+    if [ ${phpv:0:1} == 5 ]; then
+        if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf ]; then
+            cp /vagrant/files/php-fpm-xxx.conf /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
+            sed -i "s/###phpv###/${phpv}/g"    /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
+            sed -i "s/###phpn###/${phpn}/g"    /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
+            sed -i "s/###phpp###/${phpp}/g"    /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
+        fi
+    else
+        if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf ]; then
+            cp /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf.default /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
+        fi
+        if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf ]; then
+            cp /vagrant/files/php-fpm-xxx.conf /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf
+            sed -i "s/###phpv###/${phpv}/g"    /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf
+            sed -i "s/###phpn###/${phpn}/g"    /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf
+            sed -i "s/###phpp###/${phpp}/g"    /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.d/www.conf
+        fi
+    fi
+    if [ ! -f /etc/init.d/php-${phpn} ]; then
+        cp /vagrant/files/php-init.d-xxx.sh /etc/init.d/php-${phpn}
+        sed -i "s/###phpv###/${phpv}/g" /etc/init.d/php-${phpn}
+        chmod +x /etc/init.d/php-${phpn}
+        update-rc.d php-${phpn} defaults
+    fi
+done
 
 
 
@@ -112,5 +100,8 @@ if ! grep -q "phpfarm" /etc/environment ; then
     echo "PATH="$PATH:/opt/phpfarm/inst/bin:/opt/phpfarm/inst/current/bin:/opt/phpfarm/inst/current/sbin"" >> /etc/environment
 fi
 
-#set Default Php
-/opt/phpfarm/inst/bin/switch-phpfarm 5.6.20
+
+
+# Set Default php to oldest available
+php_version=$(ls -1 /opt/phpfarm/inst/ | grep php | head -n1 | cut -d'-' -f2);
+/opt/phpfarm/inst/bin/switch-phpfarm ${php_version}

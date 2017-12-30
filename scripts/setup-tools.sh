@@ -6,7 +6,8 @@ set -ex
 # Setup Composer
 if [ ! -f /usr/local/bin/composer ]; then
     cd /tmp
-    curl -sS https://getcomposer.org/installer | /opt/phpfarm/inst/php-5.4.45/bin/php
+    php=/opt/phpfarm/inst/php-$(ls -1 /opt/phpfarm/inst/ | grep php | head -n1 | cut -d'-' -f2)/bin/php;
+    curl -sS https://getcomposer.org/installer | ${php}
     mv composer.phar /usr/local/bin/composer
     chmod +x /usr/local/bin/composer
 fi

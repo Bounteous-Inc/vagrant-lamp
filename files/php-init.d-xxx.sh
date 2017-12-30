@@ -10,11 +10,11 @@
 # Description:       starts the PHP FastCGI Process Manager daemon
 ### END INIT INFO
 
-prefix=/opt/phpfarm/inst/php-5.5.34
+prefix=/opt/phpfarm/inst/php-###phpv###
 exec_prefix=${prefix}
 
 php_fpm_BIN=${exec_prefix}/sbin/php-fpm
-php_fpm_CONF=${prefix}/etc/php-fpm.conf
+php_fpm_CONF=${prefix}/etc/php-fpm.d/www.conf
 php_fpm_PID=${prefix}/var/run/php-fpm.pid
 
 
