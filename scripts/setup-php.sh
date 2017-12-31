@@ -50,11 +50,6 @@ for i in "${php_versions[@]}"; do
     phpn=${arr[1]}
     phpp=${arr[2]}
 
-    # Make aliases
-    phpa="alias php${phpn}='/opt/phpfarm/inst/php-${phpv}/bin/php'";
-    echo ${phpa} >> /home/vagrant/.bash_aliases;
-    echo ${phpa} >> /root/.bash_aliases;
-
     if [ ! -f /opt/phpfarm/inst/php-${phpv}/bin/php ]; then
         cd /opt/phpfarm/src
         ./main.sh ${phpv}

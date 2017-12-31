@@ -1,3 +1,16 @@
+function help {
+  source /vagrant/php_settings.sh
+  _versions=''
+  for i in "${php_versions[@]}"; do
+    arr=(${i// / })
+    phpv=${arr[0]}'    '
+    phpn=${arr[1]}
+    phpp=${arr[2]}
+    _versions="${_versions}  * PHP ${phpv:0:6} (alias php${phpn})\n"
+  done;
+  sed "s/###php_versions###/${_versions}/g" /vagrant/files/help.txt
+}
+
 function m1m2 {
   if [ -e app/etc/local.xml ]; then
     echo 'M1';
@@ -7,6 +20,7 @@ function m1m2 {
     echo -e '\e[1;31mERROR:\e[0;31m Cannot determine magento version in use at '`pwd`'\e[0m';
   fi;
 }
+
 function cac {
   case $(m1m2) in
     M1)
@@ -24,6 +38,7 @@ function cac {
       ;;
   esac
 }
+
 function getMSetting {
   case $(m1m2) in
     M1)
@@ -34,6 +49,7 @@ function getMSetting {
       ;;
   esac
 }
+
 function connectDb {
   case $(m1m2) in
     M1 | M2)
@@ -46,6 +62,7 @@ function connectDb {
       ;;
   esac
 }
+
 function templateHelp  {
   case $(m1m2) in
     M1)
@@ -60,7 +77,9 @@ function templateHelp  {
       ;;
   esac
 }
+
 function err           { clear; cat "var/report/${1:-$(ls -t var/report/* | head -1 | cut -d'/' -f3)}" ; echo ""; }
+
 function xdebug {
   state=$([ ${1:-1} == 0 ] && echo ";");
   echo $([ ${1:-1} == 0 ] && echo "Disabling" || echo "Enabling")" X-Debug:"
@@ -76,7 +95,14 @@ function xdebug {
 alias ll='ls -al'
 alias lh='ls -alh'
 alias mem='free | awk '\''/Mem/{printf("Memory used: %.2f%"), $3/$2*100} /buffers\/cache/{printf(", buffers: %.2f%\n"), $4/($3+$4)*100}'\'''
-alias php5.6='/opt/phpfarm/inst/php-5.6.20/bin/php'
-alias php7='/opt/phpfarm/inst/php-7.0.6/bin/php'
-alias php7.1='/opt/phpfarm/inst/php-7.1.12/bin/php'
-alias help='cat /vagrant/files/help.txt'
+
+source /vagrant/php_versions.sh
+for i in "${php_versions[@]}"; do
+    arr=(${i// / })
+    phpv=${arr[0]}
+    phpn=${arr[1]}
+    phpp=${arr[2]}
+    phpa="php${phpn}='/opt/phpfarm/inst/php-${phpv}/bin/php'"
+    # Make aliases
+    alias $phpa;
+done;

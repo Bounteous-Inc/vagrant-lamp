@@ -2,16 +2,16 @@
  Demac Vagrant Lamp 1.0.2
 --------------------------
 The following PHP versions are available with this release:
-  * PHP 5.6.20 (alias php5.6)
-  * PHP 7.0.7  (alias php7)
-  * PHP 7.1.12 (alias php7.1)
+###php_versions###
+The following functions and aliases are available:
 
-The following commands are added:
+GENERAL:
+  xdebug 0|1        - enables / disables xdebug for all installed PHP versions (saves memory and load time)
+  mem               - shows percentage of memory you have remaining in the VM
 
-xdebug 0|1        - enables / disables xdebug (saves memory and load time)
-mem               - shows percentage of memory you have remaining in the VM
+MAGENTO:
+  m1m2              - identifies if your instance is M1 or M2 - used by other commands
+  connectDb         - uses M1 or M2 config settings and connects to the site database
+                      echo "SELECT * from core_config_data WHERE path like 'base_url'" | connectDb
+  templateHelp 0|1  - enables / disables template help (M1 only)
 
-m1m2              - identifies if your instance is M1 or M2 - used by other commands
-connectDb         - uses M1 or M2 config settings and connects to the site database
-                    echo "SELECT * from core_config_data WHERE path like 'base_url'" | connectDb
-templateHelp 0|1  - enables / disables template help (M1 only)
