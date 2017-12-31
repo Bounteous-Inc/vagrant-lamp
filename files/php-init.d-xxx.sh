@@ -14,7 +14,7 @@ prefix=/opt/phpfarm/inst/php-###phpv###
 exec_prefix=${prefix}
 
 php_fpm_BIN=${exec_prefix}/sbin/php-fpm
-php_fpm_CONF=${prefix}/etc/php-fpm.d/www.conf
+php_fpm_CONF=${prefix}###php_config_suffix###
 php_fpm_PID=${prefix}/var/run/php-fpm.pid
 
 

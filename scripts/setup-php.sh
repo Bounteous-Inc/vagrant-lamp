@@ -3,13 +3,6 @@
 # Enable trace printing and exit on the first error
 set -ex
 
-php_versions=(
-#  'version    shortname  port'
-   '5.6.20     5.6        9006'
-   '7.0.6      7          9007'
-   '7.1.12     7.1        9008'
-)
-
 function setup_xdebug() {
     cd /usr/lib
     if [ -d /usr/lib/xdebug ]; then
@@ -49,6 +42,7 @@ if grep -q "php-7.0.5" /etc/init.d/php-7 ; then
     rm /etc/init.d/php-7
 fi
 
+source ../php_versions.sh
 
 for i in "${php_versions[@]}"; do
     arr=(${i// / })
@@ -68,6 +62,7 @@ for i in "${php_versions[@]}"; do
         cp /opt/phpfarm/inst/php-${phpv}/etc/php.ini /opt/phpfarm/inst/php-${phpv}/lib/php.ini
     fi
     if [ ${phpv:0:1} == 5 ]; then
+        php_config_suffix_escaped="\/etc\/php-fpm.conf"
         if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf ]; then
             cp /vagrant/files/php-fpm-xxx.conf /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
             sed -i "s/###phpv###/${phpv}/g"    /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
@@ -75,6 +70,7 @@ for i in "${php_versions[@]}"; do
             sed -i "s/###phpp###/${phpp}/g"    /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
         fi
     else
+        php_config_suffix_escaped="\/etc\/php-fpm.d\/www.conf"
         if [ ! -f /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf ]; then
             cp /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf.default /opt/phpfarm/inst/php-${phpv}/etc/php-fpm.conf
         fi
@@ -88,6 +84,7 @@ for i in "${php_versions[@]}"; do
     if [ ! -f /etc/init.d/php-${phpn} ]; then
         cp /vagrant/files/php-init.d-xxx.sh /etc/init.d/php-${phpn}
         sed -i "s/###phpv###/${phpv}/g" /etc/init.d/php-${phpn}
+        sed -i "s/###php_config_suffix###/${php_config_suffix_escaped}/g" /etc/init.d/php-${phpn}
         chmod +x /etc/init.d/php-${phpn}
         update-rc.d php-${phpn} defaults
     fi
