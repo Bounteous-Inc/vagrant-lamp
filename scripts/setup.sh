@@ -33,9 +33,9 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
   fi
 done </vagrant/files/hosts.txt
 
-# Copy bash aliases for vagrant and root users
-cp /vagrant/files/.bash_aliases /home/vagrant
-cp /vagrant/files/.bash_aliases /root
+# Copy bash aliases and welcome message for all users
+cp /vagrant/files/00-aliases.sh /etc/profile.d/
+cp /vagrant/files/99-welcome.sh /etc/profile.d/
 
 #Setup PHP compile pre-requisites
 apt-get install -y  build-essential libbz2-dev libmysqlclient-dev libxpm-dev libmcrypt-dev \

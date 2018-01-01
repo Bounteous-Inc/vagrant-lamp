@@ -11,6 +11,14 @@ function setup_xdebug() {
     git clone git://github.com/xdebug/xdebug.git
     cd xdebug
 
+    if [[ $1 == *"5.4"* ]] ; then
+        git checkout xdebug_2_3
+    fi
+
+    if [[ $1 == *"5.5"* ]] ; then
+        git checkout xdebug_2_4
+    fi
+
     if [[ $1 == *"5.6"* ]] ; then
         git checkout xdebug_2_5
     fi
@@ -42,7 +50,7 @@ if grep -q "php-7.0.5" /etc/init.d/php-7 ; then
     rm /etc/init.d/php-7
 fi
 
-source ../php_versions.sh
+source /vagrant/php_versions.sh
 
 for i in "${php_versions[@]}"; do
     arr=(${i// / })

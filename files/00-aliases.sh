@@ -1,14 +1,18 @@
-function help {
-  source /vagrant/php_settings.sh
+function vhelp {
+  source /vagrant/php_versions.sh
   _versions=''
   for i in "${php_versions[@]}"; do
     arr=(${i// / })
-    phpv=${arr[0]}'    '
+    phpv=${arr[0]}
     phpn=${arr[1]}
-    phpp=${arr[2]}
-    _versions="${_versions}  * PHP ${phpv:0:6} (alias php${phpn})\n"
+    phpv_x=${phpv}'     '
+    phpn_x=${phpn}'     '
+    line="  * PHP ${phpv_x:0:6} (alias php${phpn})   "
+    line="${line:0:30} - e.g. php${phpn_x:0:3} -v"
+    _versions="${_versions}${line}\n"
   done;
-  sed "s/###php_versions###/${_versions}/g" /vagrant/files/help.txt
+  text=$(sed "s/###php_versions###/${_versions}/g" /vagrant/files/welcome.txt);
+  echo -e "$text"
 }
 
 function m1m2 {

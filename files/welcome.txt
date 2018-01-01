@@ -1,0 +1,25 @@
+\e[32;1m
+--------------------------
+ Demac Vagrant Lamp 1.0.2
+--------------------------\e[0;32m
+The following functions and aliases are available:
+
+\e[1mGENERAL:\e[0;32m
+  mem               - Shows percentage of memory you have remaining in this VM environment
+  vhelp             - Displays this help message
+  xdebug 0|1        - Enables / disables xdebug for all installed PHP versions (saves memory and load time)
+
+\e[1mMAGENTO:\e[0;32m
+  cac               - Clears cache
+  err               - Shows last error report (if any)
+  getMSetting       - Get any setting from magento's local.xml or env.php - e.g. from magento base folder:
+                        \e[33mgetMSetting 'dbname'\e[0;32m
+  m1m2              - Identifies if your instance is M1 or M2
+  connectDb         - Connects to the site database - e.g. from magento base folder:
+                        \e[33mecho "SELECT * from core_config_data WHERE path like 'base_url'" | connectDb\e[0;32m
+  templateHelp 0|1  - Enables / disables template help (M1 only)
+
+\e[1mPHP:\e[0;32m
+  The following PHP versions are available with this release:
+###php_versions###
+\e[0m

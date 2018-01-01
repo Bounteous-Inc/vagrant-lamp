@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 php_versions=(
 #  'version    shortname  port'
-   '5.3.26     5.3        9003'
    '5.4.45     5.4        9004'
    '5.5.34     5.5        9005'
    '5.6.20     5.6        9006'
