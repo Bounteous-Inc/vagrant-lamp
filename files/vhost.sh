@@ -4,7 +4,8 @@
 # Show Usage, Output to STDERR
 #
 function show_usage {
-    local help=<<- _EOF_
+    local help=''
+    read -r -d '' help << EOF_HELP
 
 Create or Remove vHost in Ubuntu Server
 Assumes PHP-FPM with proxy_fcgi and /etc/apache2/sites-available and /etc/apache2/sites-enabled setup are used
@@ -15,8 +16,8 @@ Options:
   -h Help            : Show this menu.
   -n ServerName      : Domain i.e. example.com or sub.example.com or 'js.example.com static.example.com'
   -a ServerAlias     : Alias i.e. *.example.com or another domain altogether OPTIONAL
-  -p PHPVersion      : PHP Version: choose one of these:
-                       ###php_versions###
+  -p PHPVersion      : PHP Version:
+                       choose one of these:  ###php_versions###
   -s CertPath        : ***SELF SIGNED CERTIFICATE ARE AUTOMATICALLY CREATED FOR EACH VHOST USE THIS TO OVERRIDE***
                        File path to the SSL certificate. Directories only, no file name. OPTIONAL
                        If using an SSL Certificate, also creates a port :443 vhost as well.
@@ -35,8 +36,15 @@ Options:
                        Certificate Name "example.com" becomes "example.com.key" and "example.com.crt". OPTIONAL
                        Will default to ServerName
 
-_EOF_
-    echo "$help" 
+EOF_HELP
+    source /vagrant/php_versions.sh
+    local _versions=''
+    for i in "${php_versions[@]}"; do
+        arr=(${i// / })
+        phpn=${arr[1]}
+        _versions="${_versions}${phpn}  "
+    done;
+    echo "$help" | sed "s/###php_versions###/${_versions}/g";
     exit 1
 }
 
