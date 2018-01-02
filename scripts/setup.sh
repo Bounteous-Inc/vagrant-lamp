@@ -37,6 +37,9 @@ done </vagrant/files/hosts.txt
 cp /vagrant/files/00-aliases.sh /etc/profile.d/
 cp /vagrant/files/99-welcome.sh /etc/profile.d/
 
+# Next line needed so that root will have access to these aliases
+echo "source /etc/profile.d/00-aliases.sh" >> /root/.bash_aliases
+
 #Setup PHP compile pre-requisites
 apt-get install -y  build-essential libbz2-dev libmysqlclient-dev libxpm-dev libmcrypt-dev \
     libcurl4-gnutls-dev libxml2-dev libjpeg-dev libpng12-dev libssl-dev pkg-config libreadline-dev \

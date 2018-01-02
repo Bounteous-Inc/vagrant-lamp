@@ -7,8 +7,7 @@ function vhelp {
     phpn=${arr[1]}
     phpv_x=${phpv}'     '
     phpn_x=${phpn}'     '
-    line="  * PHP ${phpv_x:0:6} (alias php${phpn})   "
-    line="${line:0:30} - e.g. php${phpn_x:0:3} -v"
+    line="  * PHP ${phpv_x:0:6}      - alias php${phpn}"
     _versions="${_versions}${line}\n"
   done;
   text=$(sed "s/###php_versions###/${_versions}/g" /vagrant/files/welcome.txt);
@@ -67,6 +66,15 @@ function connectDb {
   esac
 }
 
+function phpRestart() {
+  source /vagrant/php_versions.sh
+  for i in "${php_versions[@]}"; do
+    local arr=(${i// / })
+    local phpn=${arr[1]}
+    sudo service php-${phpn} restart
+  done;
+}
+
 function templateHelp  {
   case $(m1m2) in
     M1)
@@ -99,6 +107,7 @@ function xdebug {
 alias ll='ls -al'
 alias lh='ls -alh'
 alias mem='free | awk '\''/Mem/{printf("Memory used: %.2f%"), $3/$2*100} /buffers\/cache/{printf(", buffers: %.2f%\n"), $4/($3+$4)*100}'\'''
+alias sudo='sudo '
 
 source /vagrant/php_versions.sh
 for i in "${php_versions[@]}"; do

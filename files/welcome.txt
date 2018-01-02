@@ -7,7 +7,7 @@ The following functions and aliases are available:
 \e[1mGENERAL:\e[0;32m
   mem               - Shows percentage of memory you have remaining in this VM environment
   vhelp             - Displays this help message
-  xdebug 0|1        - Enables / disables xdebug for all installed PHP versions (saves memory and load time)
+
 
 \e[1mMAGENTO:\e[0;32m
   cac               - Clears cache
@@ -19,7 +19,10 @@ The following functions and aliases are available:
                         \e[33mecho "SELECT * from core_config_data WHERE path like 'base_url'" | connectDb\e[0;32m
   templateHelp 0|1  - Enables / disables template help (M1 only)
 
+
 \e[1mPHP:\e[0;32m
-  The following PHP versions are available with this release:
-###php_versions###
-\e[0m
+  phpRestart        - restarts all installed PHP FPM services
+  xdebug 0|1        - Enables / Disables xdebug for all installed PHP versions (switching off saves time and memory)
+
+  The following PHP versions are available with this release and may be invoked in shell via their aliases:
+###php_versions###\e[0m

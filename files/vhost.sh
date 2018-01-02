@@ -4,7 +4,7 @@
 # Show Usage, Output to STDERR
 #
 function show_usage {
-cat <<- _EOF_
+    local help=<<- _EOF_
 
 Create or Remove vHost in Ubuntu Server
 Assumes PHP-FPM with proxy_fcgi and /etc/apache2/sites-available and /etc/apache2/sites-enabled setup are used
@@ -15,7 +15,8 @@ Options:
   -h Help            : Show this menu.
   -n ServerName      : Domain i.e. example.com or sub.example.com or 'js.example.com static.example.com'
   -a ServerAlias     : Alias i.e. *.example.com or another domain altogether OPTIONAL
-  -p PHPVersion      : PHP Version: choose one of 5.6, 7 or 7.1
+  -p PHPVersion      : PHP Version: choose one of these:
+                       ###php_versions###
   -s CertPath        : ***SELF SIGNED CERTIFICATE ARE AUTOMATICALLY CREATED FOR EACH VHOST USE THIS TO OVERRIDE***
                        File path to the SSL certificate. Directories only, no file name. OPTIONAL
                        If using an SSL Certificate, also creates a port :443 vhost as well.
@@ -35,7 +36,8 @@ Options:
                        Will default to ServerName
 
 _EOF_
-exit 1
+    echo "$help" 
+    exit 1
 }
 
 #
@@ -213,21 +215,20 @@ function remove_vhost {
 }
 
 function parse_php_version {
-    case ${PhpVersion} in
-        5.6)
-            PhpPort=9006
-            ;;
-        7)
-            PhpPort=9007
-            ;;
-        7.1)
-            PhpPort=9008
-            ;;
-        *)
-            echo 'Invalid PHP Version. Aborting'
-            show_usage
-            ;;
-    esac
+    source /vagrant/php_versions.sh
+    for i in "${php_versions[@]}"; do
+        local arr=(${i// / })
+        local phpv=${arr[0]}
+        local phpn=${arr[1]}
+        local phpp=${arr[2]}
+        if [ ${PhpVersion} == ${phpn} ]; then
+            PhpPort=${phpp}
+        fi
+    done;
+    if [ -z ${PhpPort+x} ]; then
+        echo 'Invalid PHP Version. Aborting'
+        show_usage
+    fi
 }
 
 # Set Defaults
