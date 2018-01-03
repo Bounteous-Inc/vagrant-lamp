@@ -7,6 +7,7 @@ The following functions and aliases are available:
 \e[1mGENERAL:\e[0;32m
   mem               - Shows percentage of memory you have remaining in this VM environment
   vhelp             - Displays this help message
+  www               - Changes to the /srv/www directory
 
 
 \e[1mMAGENTO:\e[0;32m

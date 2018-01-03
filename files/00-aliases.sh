@@ -48,7 +48,7 @@ function getMSetting {
       grep "<${1}>" app/etc/local.xml | cut -d'[' -f3 | cut -d']' -f1;
       ;;
     M2)
-      echo "<?php \$test=include('./app/etc/env.php'); print_r(\$test['db']['connection']['default']['${1}']) ?>" | php7;
+      echo "<?php \$test=include('./app/etc/env.php'); print_r(\$test['db']['connection']['default']['${1}']) ?>" | php;
       ;;
   esac
 }
@@ -108,6 +108,7 @@ alias ll='ls -al'
 alias lh='ls -alh'
 alias mem='free | awk '\''/Mem/{printf("Memory used: %.2f%"), $3/$2*100} /buffers\/cache/{printf(", buffers: %.2f%\n"), $4/($3+$4)*100}'\'''
 alias sudo='sudo '
+alias www='cd /srv/www'
 
 source /vagrant/php_versions.sh
 for i in "${php_versions[@]}"; do
