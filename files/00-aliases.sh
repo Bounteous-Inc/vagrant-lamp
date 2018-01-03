@@ -66,6 +66,34 @@ function connectDb {
   esac
 }
 
+function backupMysql {
+  export MYSQL_PWD='root'
+  databases=`mysql -uroot -e "SHOW DATABASES;" | tr -d "| " | grep -v Database`
+  for db in $databases; do
+    case ${db} in
+      'information_schema' | 'performance_schema' | 'sys' | 'mysql' | 'test' | _*)
+        # skip it
+        ;;
+      *)
+        echo "Dumping database: $db"
+        mysqldump -uroot --databases $db | gzip > /srv/mysql_backups/$db.sql.gz
+        ;;
+    esac
+  done
+  pt-show-grants -uroot -proot | gzip > /srv/mysql_backups/mysql_users.sql.gz
+  export MYSQL_PWD=''
+}
+
+function restoreMysql {
+  export MYSQL_PWD='root'
+  databases=`ls -1 backupdbs.*.sql`
+  for db in $databases; do
+    echo "Importing $db ..."
+    zcat $db | mysql -u $USER
+  done
+  export MYSQL_PWD=''
+}
+
 function phpRestart() {
   source /vagrant/php_versions.sh
   for i in "${php_versions[@]}"; do

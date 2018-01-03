@@ -10,6 +10,12 @@ The following functions and aliases are available:
   www               - Changes to the /srv/www directory
 
 
+\e[1mMYSQL:\e[0;32m
+  backupMysql       - Makes a dump of all your mysql databases and users into /srv/mysql_backups.
+                      This is shared on your host machine so will survive a \e[33mvagrant destroy\e[0;32m
+  restoreMysql      - Restores all your mysql databases and users from /srv/mysql_backups.
+                      This is shared on your host machine so will survive a \e[33mvagrant destroy\e[0;32m
+
 \e[1mMAGENTO:\e[0;32m
   cac               - Clears cache
   err               - Shows last error report (if any)
