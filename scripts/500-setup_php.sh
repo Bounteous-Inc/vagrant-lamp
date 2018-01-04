@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+echo "******************************"
+echo "* 500-setup_php.sh           *"
+echo "******************************"
 
 # Enable trace printing and exit on the first error
 set -ex

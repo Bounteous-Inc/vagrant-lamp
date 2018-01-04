@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-
-echo ">>> Installing Mailhog"
+echo "******************************"
+echo "* 66666600-setup_mail.sh          *"
+echo "******************************"
 
 # Download binary from github
 if [ ! -f /usr/local/bin/mailhog ]; then

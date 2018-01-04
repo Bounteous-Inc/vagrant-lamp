@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+echo "******************************"
+echo "* 100-setup_apache.sh        *"
+echo "******************************"
 
 # Enable trace printing and exit on the first error
 set -ex

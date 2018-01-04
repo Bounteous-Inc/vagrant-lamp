@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+echo "******************************"
+echo "* 300-setup_redis.sh         *"
+echo "******************************"
 
 # Enable trace printing and exit on the first error
 set -ex

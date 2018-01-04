@@ -72,8 +72,9 @@ Vagrant.configure(2) do |config|
   end
 
   # Run all setup scripts in numbered order:
-  Dir.glob("scripts/*.sh") do |setup_script|
-    provision_name = setup_script.split('/')[1].split('-')[1].split('.')[0]
+  dir = File.dirname(File.expand_path(__FILE__))
+  Dir.glob("#{dir}/scripts/*.sh") do |setup_script|
+    provision_name = setup_script.split('/')[-1].split('-')[1].split('.')[0]
     config.vm.provision provision_name, type: "shell", path: setup_script
   end
 

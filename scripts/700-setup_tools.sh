@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+echo "******************************"
+echo "* 700-setup_tools.sh         *"
+echo "******************************"
 
 # Enable trace printing and exit on the first error
 set -ex

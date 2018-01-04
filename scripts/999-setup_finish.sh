@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+echo "******************************"
+echo "* 999-setup_finish.sh        *"
+echo "******************************"
 
 # Restart Services
 service apache2 restart

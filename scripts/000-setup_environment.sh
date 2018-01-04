@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+echo "******************************"
+echo "* 000-setup_environment.sh   *"
+echo "******************************"
 
 # Enable trace printing and exit on the first error
 set -ex
