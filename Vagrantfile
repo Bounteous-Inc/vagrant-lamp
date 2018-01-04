@@ -69,15 +69,20 @@ Vagrant.configure(2) do |config|
     vb.customize ['modifyvm', :id, '--ioapic', 'on']
   end
 
-  config.vm.provision "setup_environment", type: "shell", path: "scripts/setup.sh"
-  config.vm.provision "setup_apache", type: "shell", path: "scripts/setup-apache.sh"
-  config.vm.provision "setup_varnish", type: "shell", path: "scripts/setup-varnish.sh"
-  config.vm.provision "setup_redis", type: "shell", path: "scripts/setup-redis.sh"
-  config.vm.provision "setup_percona", type: "shell", path: "scripts/setup-percona.sh"
-  config.vm.provision "setup_php", type: "shell", path: "scripts/setup-php.sh"
-  config.vm.provision "setup_mail", type: "shell", path: "scripts/setup-mail.sh"
-  config.vm.provision "setup_tools", type: "shell", path: "scripts/setup-tools.sh"
-  config.vm.provision "setup_finish", type: "shell", path: "scripts/setup-finish.sh"
+  Dir.glob("scripts/*.sh") do |setup_script|
+    provision_name = setup_script.split('/')[1].split('-')[1].split('.')[0]
+    config.vm.provision provision_name, type: "shell", path: setup_script
+  end
+
+#  config.vm.provision "setup_environment", type: "shell", path: "scripts/setup.sh"
+#  config.vm.provision "setup_apache", type: "shell", path: "scripts/setup-apache.sh"
+#  config.vm.provision "setup_varnish", type: "shell", path: "scripts/setup-varnish.sh"
+#  config.vm.provision "setup_redis", type: "shell", path: "scripts/setup-redis.sh"
+#  config.vm.provision "setup_mysql", type: "shell", path: "scripts/setup-mysql.sh"
+#  config.vm.provision "setup_php", type: "shell", path: "scripts/setup-php.sh"
+#  config.vm.provision "setup_mail", type: "shell", path: "scripts/setup-mail.sh"
+#  config.vm.provision "setup_tools", type: "shell", path: "scripts/setup-tools.sh"
+#  config.vm.provision "setup_finish", type: "shell", path: "scripts/setup-finish.sh"
 
   config.vm.define vconfig['vagrant_machine_name']
 
