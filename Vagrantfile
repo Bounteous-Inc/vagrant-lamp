@@ -37,7 +37,7 @@ Vagrant.configure(2) do |config|
     config.vm.network :public_network, ip: vconfig['vagrant_public_ip']
   end
 
- # Synced folders.
+  # Synced folders.
   vconfig['vagrant_synced_folders'].each do |synced_folder|
     options = {
       type: synced_folder['type'],
@@ -46,20 +46,22 @@ Vagrant.configure(2) do |config|
       rsync__args: ['--verbose', '--archive', '--delete', '-z', '--chmod=ugo=rwX'],
       id: synced_folder['id'],
       create: synced_folder.include?('create') ? synced_folder['create'] : false,
-      mount_options: synced_folder.include?('mount_options') ? synced_folder['mount_options'] : []
+      mount_options: synced_folder.include?('mount_options') ? synced_folder['mount_options'] : [],
+      owner: synced_folder['owner'] ? synced_folder['owner'] : 'vagrant',
+      group: synced_folder['group'] ? synced_folder['group'] : 'vagrant'
     }
     if synced_folder.include?('options_override')
       options = options.merge(synced_folder['options_override'])
     end
     if synced_folder['type'] == 'nfs' && !Vagrant::Util::Platform.windows?
-	  config.vm.synced_folder synced_folder['local_path'], '/nfs' + synced_folder['destination'], options
-	  config.bindfs.bind_folder "/nfs" + synced_folder['destination'], synced_folder['destination'], :owner => "vagrant", :group => "vagrant", :'create-as-user' => true, :perms => "u=rwx:g=rwx:o=r", :'create-with-perms' => "u=rwx:g=rwx:o=r", :'chown-ignore' => true, :'chgrp-ignore' => true, :'chmod-ignore' => true
+      config.vm.synced_folder synced_folder['local_path'], '/nfs' + synced_folder['destination'], options
+      config.bindfs.bind_folder "/nfs" + synced_folder['destination'], synced_folder['destination'], :owner => "vagrant", :group => "vagrant", :'create-as-user' => true, :perms => "u=rwx:g=rwx:o=r", :'create-with-perms' => "u=rwx:g=rwx:o=r", :'chown-ignore' => true, :'chgrp-ignore' => true, :'chmod-ignore' => true
     else
 	  config.vm.synced_folder synced_folder['local_path'], synced_folder['destination'], options
 	end
   end
 
- # VirtualBox.
+  # VirtualBox.
   config.vm.provider :virtualbox do |vb|
     vb.linked_clone = true if Vagrant::VERSION =~ /^1.8/
     vb.name = vconfig['vagrant_hostname']
@@ -69,20 +71,11 @@ Vagrant.configure(2) do |config|
     vb.customize ['modifyvm', :id, '--ioapic', 'on']
   end
 
+  # Run all setup scripts in numbered order:
   Dir.glob("scripts/*.sh") do |setup_script|
     provision_name = setup_script.split('/')[1].split('-')[1].split('.')[0]
     config.vm.provision provision_name, type: "shell", path: setup_script
   end
-
-#  config.vm.provision "setup_environment", type: "shell", path: "scripts/setup.sh"
-#  config.vm.provision "setup_apache", type: "shell", path: "scripts/setup-apache.sh"
-#  config.vm.provision "setup_varnish", type: "shell", path: "scripts/setup-varnish.sh"
-#  config.vm.provision "setup_redis", type: "shell", path: "scripts/setup-redis.sh"
-#  config.vm.provision "setup_mysql", type: "shell", path: "scripts/setup-mysql.sh"
-#  config.vm.provision "setup_php", type: "shell", path: "scripts/setup-php.sh"
-#  config.vm.provision "setup_mail", type: "shell", path: "scripts/setup-mail.sh"
-#  config.vm.provision "setup_tools", type: "shell", path: "scripts/setup-tools.sh"
-#  config.vm.provision "setup_finish", type: "shell", path: "scripts/setup-finish.sh"
 
   config.vm.define vconfig['vagrant_machine_name']
 
