@@ -3,4 +3,5 @@
 .vagrant
 /www
 /mysql_backups
+/mysql_data
 /config.yml

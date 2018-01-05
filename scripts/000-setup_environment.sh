@@ -9,22 +9,22 @@ set -ex
 apt-get update
 
 # Install git
-apt-get install -y git
+apt-get install -y git 2>&1
 
 # Install HTOP
-apt-get install -y htop
+apt-get install -y htop 2>&1
 
 # Install smem
-apt-get install -y smem
+apt-get install -y smem 2>&1
 
 # Install strace
-apt-get install -y strace
+apt-get install -y strace 2>&1
 
 # Install lynx
-apt-get install -y lynx
+apt-get install -y lynx 2>&1
 
 # Install dos2unix
-apt-get install -y dos2unix
+apt-get install -y dos2unix 2>&1
 
 # Correct non Unix line endings
 find /vagrant/files -type f -exec dos2unix {} \;
@@ -46,7 +46,7 @@ echo "source /etc/profile.d/00-aliases.sh" >> /root/.bash_aliases
 #Setup PHP compile pre-requisites
 apt-get install -y  build-essential libbz2-dev libmysqlclient-dev libxpm-dev libmcrypt-dev \
     libcurl4-gnutls-dev libxml2-dev libjpeg-dev libpng12-dev libssl-dev pkg-config libreadline-dev \
-    curl autoconf libicu-dev libxslt-dev freetype*
+    curl autoconf libicu-dev libxslt-dev freetype* 2>&1
 
 # Workaround to allow custom scripts added to path with sudo
 if ! grep -q "^#Defaults[[:blank:]]*secure_path" /etc/sudoers ; then

@@ -7,7 +7,7 @@ echo "******************************"
 set -ex
 
 # Setup Varnish
-apt-get install -y varnish
+apt-get install -y varnish 2>&1
 sed -i.bak 's/.port = "8080";$/.port = "8090";\n    .connect_timeout = 30s;\n    .first_byte_timeout = 3000s;\n    .between_bytes_timeout = 50s;/' /etc/varnish/default.vcl
 
 if [ ! -f /etc/default/varnish.bak ]; then

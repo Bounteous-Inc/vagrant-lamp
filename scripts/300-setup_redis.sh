@@ -7,7 +7,7 @@ echo "******************************"
 set -ex
 
 # Setup Redis
-apt-get install -y redis-server
+apt-get install -y redis-server 2>&1
 
 #setup redis script
 yes | cp -rf /vagrant/files/redis-setup.sh /usr/local/bin/redis-setup
