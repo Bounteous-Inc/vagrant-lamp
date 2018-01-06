@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 echo "******************************"
-echo "* 66666600-setup_mail.sh          *"
+echo "* 600-setup_mail.sh          *"
 echo "******************************"
 
 # Download binary from github

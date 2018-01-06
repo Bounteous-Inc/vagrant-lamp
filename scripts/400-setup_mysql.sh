@@ -31,8 +31,8 @@ if [ ! -f /etc/init.d/mysql* ]; then
     fi
     service mysql start
     export MYSQL_PWD='root'
-    mysql -u'root' --execute="GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root';"
-    mysql -u'root' --execute="GRANT ALL PRIVILEGES ON *.* TO 'debian-sys-maint'@'localhost' IDENTIFIED BY '${debian_sys_maint_pwd}';"
+    echo "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root';" | mysql -u'root'
+    echo "GRANT ALL PRIVILEGES ON *.* TO 'debian-sys-maint'@'localhost' IDENTIFIED BY '${debian_sys_maint_pwd}';" | mysql -u'root'
     export MYSQL_PWD=''
     service mysql restart
     apt-get install -y percona-toolkit 2>&1

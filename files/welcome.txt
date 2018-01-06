@@ -18,12 +18,13 @@ The following functions and aliases are available:
 
 \e[1mMAGENTO:\e[0;32m
   cac               - Clears cache
+  connectDb         - Connects to the site database - e.g. from magento base folder:
+                        \e[33mecho "SELECT * from core_config_data WHERE path in('web/unsecure/base_url','web/secure/base_url');" | connectDb\e[0;32m  
   err               - Shows last error report (if any)
   getMSetting       - Get any setting from magento's local.xml or env.php - e.g. from magento base folder:
                         \e[33mgetMSetting 'dbname'\e[0;32m
   m1m2              - Identifies if your instance is M1 or M2
-  connectDb         - Connects to the site database - e.g. from magento base folder:
-                        \e[33mecho "SELECT * from core_config_data WHERE path like 'base_url'" | connectDb\e[0;32m
+  n98               - The n98-magerun tool is available for you to use from any magento website home directory
   templateHelp 0|1  - Enables / disables template help (M1 only)
 
 
