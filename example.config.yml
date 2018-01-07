@@ -17,15 +17,15 @@ vagrant_synced_folders:
     type:
     create: true
 
-  - local_path: ~/Sites/mysql_data
-    destination: /srv/mysql_data
+  - local_path: ~/Sites/mysql
+    destination: /srv/mysql
     type:
     create: true
     owner: 500      # mysql user  not created yet, but will have this id when the box is provisioned
     group: 500      # mysql group not created yet, but will have this id when the box is provisioned
 
-  - local_path: ~/Sites/mysql_backups
-    destination: /srv/mysql_backups
+  - local_path: ~/Sites/backup
+    destination: /srv/backup
     type:
     create: true
 
