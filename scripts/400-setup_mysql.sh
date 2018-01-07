@@ -22,7 +22,7 @@ if [ ! -f /etc/init.d/mysql* ]; then
 
     sed -i "s/bind-address.*/bind-address    = 0.0.0.0/"           /etc/mysql/my.cnf
     sed -i "s/max_allowed_packet.*/max_allowed_packet      = 64M/" /etc/mysql/my.cnf
-    sed -i "s/datadir.*/datadir         = \/srv\/mysql/data/"      /etc/mysql/my.cnf
+    sed -i "s/datadir.*/datadir         = \/srv\/mysql\/data/"     /etc/mysql/my.cnf
     if [ ! -d /srv/mysql/data/mysql ]; then
         echo "Moving mysql databases from /var/lib/mysql/ to /srv/mysql/data ..."
         mv /var/lib/mysql/* /srv/mysql/data
