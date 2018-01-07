@@ -41,9 +41,9 @@ EOL
     sudo service mailhog start
 fi
 
-if [ ! -f /etc/apache2/sites-available/mailhog.demacmedia.com.conf ]; then
+if [ ! -f /etc/apache2/sites-available/100-mailhog.demacmedia.com.conf ]; then
     # Add Vhost
-    sudo tee /etc/apache2/sites-available/mailhog.demacmedia.com.conf <<EOL
+    sudo tee /etc/apache2/sites-available/100-mailhog.demacmedia.com.conf <<EOL
 <VirtualHost *:8090>
   ProxyPreserveHost On
   ProxyRequests Off
@@ -54,7 +54,7 @@ if [ ! -f /etc/apache2/sites-available/mailhog.demacmedia.com.conf ]; then
 EOL
 
     # Enable Vhost
-    sudo a2ensite mailhog.demacmedia.com
+    sudo a2ensite 100-mailhog.demacmedia.com
 
     # Reload apache
     sudo service apache2 reload

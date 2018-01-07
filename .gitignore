@@ -2,6 +2,6 @@
 .idea
 .vagrant
 /www
-/mysql_backups
-/mysql_data
+/backup
+/mysql
 /config.yml

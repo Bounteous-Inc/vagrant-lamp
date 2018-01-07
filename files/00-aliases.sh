@@ -76,22 +76,39 @@ function backupMysql {
         ;;
       *)
         echo "Dumping database: $db"
-        mysqldump -uroot --databases $db | gzip > /srv/mysql_backups/$db.sql.gz
+        mysqldump -uroot --databases $db | gzip > /srv/backup/mysql/$db.sql.gz
         ;;
     esac
   done
-  pt-show-grants -uroot -proot | gzip > /srv/mysql_backups/mysql_users.sql.gz
+  pt-show-grants -uroot -proot | gzip > /srv/backup/mysql/mysql_users.sql.gz
   export MYSQL_PWD=''
 }
 
 function restoreMysql {
   export MYSQL_PWD='root'
-  databases=`ls -1 backupdbs.*.sql`
+  databases=`ls -1 /srv/backup/mysql/*.sql.gz`
   for db in $databases; do
     echo "Importing $db ..."
-    zcat $db | mysql -u $USER
+    zcat $db | mysql -u root
   done
   export MYSQL_PWD=''
+}
+
+function backupWebconfig {
+  if [ -f /srv/backup/webconfig/config.tar ]; then
+    rm -f /srv/backup/webconfig/config.tar
+  fi
+  tar -cf /srv/backup/webconfig/config.tar /etc/apache2/sites-available/200-* /etc/apache2/sites-enabled/200-* /etc/apache2/ssl
+}
+
+function restoreWebconfig {
+  if [ -f /srv/backup/webconfig/config.tar ]; then
+    cd /
+    sudo tar -xf /srv/backup/webconfig/config.tar
+    cd -
+  else 
+    echo "Error - no /srv/backup/webconfig/config.tar file is present. You need to execute backupWebconfig first."
+  fi
 }
 
 function phpRestart() {

@@ -175,7 +175,7 @@ function add_vhost {
         #chown USER:USER $DocumentRoot #POSSIBLE IMPLEMENTATION, new flag -u ?
     fi
 
-    create_vhost > /etc/apache2/sites-available/${ServerName}.conf
+    create_vhost > /etc/apache2/sites-available/200-${ServerName}.conf
 
     # Make directory to place SSL Certificate if it doesn't exists
     if [[ ! -d $KeyPath ]]; then
@@ -198,10 +198,10 @@ function add_vhost {
         fi
     fi
 
-    create_ssl_vhost >> /etc/apache2/sites-available/${ServerName}.conf
+    create_ssl_vhost >> /etc/apache2/sites-available/200-${ServerName}.conf
 
     # Enable Site
-    cd /etc/apache2/sites-available/ && a2ensite ${ServerName}.conf
+    cd /etc/apache2/sites-available/ && a2ensite 200-${ServerName}.conf
 
     # Add entry to hosts
     if ! grep -q "127.0.0.1 $ServerName" /etc/hosts ; then
@@ -211,14 +211,14 @@ function add_vhost {
 }
 
 function remove_vhost {
-    if [ ! -f "/etc/apache2/sites-available/$ServerName.conf" ]; then
+    if [ ! -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
         echo "vHost $ServerName not found. Aborting"
         show_usage
     fi
-    if [ -f "/etc/apache2/sites-enabled/$ServerName.conf" ]; then
-        cd /etc/apache2/sites-available/ && a2dissite ${ServerName}.conf
+    if [ -f "/etc/apache2/sites-enabled/200-$ServerName.conf" ]; then
+        cd /etc/apache2/sites-available/ && a2dissite 200-${ServerName}.conf
     fi
-    rm /etc/apache2/sites-available/${ServerName}.conf
+    rm /etc/apache2/sites-available/200-${ServerName}.conf
     service apache2 reload
 }
 
@@ -315,7 +315,7 @@ elif [ "$Task" = "add" ] ; then
     elif [ "$CertPath" == "" ] && [ "$KeyPath" != "" ]; then
         echo 'When supplying KeyPath, CertPath must also be supplied!! Aborting'
         show_usage
-    elif [ -f "/etc/apache2/sites-available/$ServerName.conf" ]; then
+    elif [ -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
         if confirm "vHost $ServerName already exists. Remove and Recreate? [y/N]" ; then
             remove_vhost
         else

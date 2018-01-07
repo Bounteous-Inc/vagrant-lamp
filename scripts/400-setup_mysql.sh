@@ -22,12 +22,12 @@ if [ ! -f /etc/init.d/mysql* ]; then
 
     sed -i "s/bind-address.*/bind-address    = 0.0.0.0/"           /etc/mysql/my.cnf
     sed -i "s/max_allowed_packet.*/max_allowed_packet      = 64M/" /etc/mysql/my.cnf
-    sed -i "s/datadir.*/datadir         = \/srv\/mysql_data/"      /etc/mysql/my.cnf
-    if [ ! -d /srv/mysql_data/mysql ]; then
-        echo "Moving mysql databases from /var/lib/mysql/ to /srv/mysql_data ..."
-        mv /var/lib/mysql/* /srv/mysql_data
+    sed -i "s/datadir.*/datadir         = \/srv\/mysql/data/"      /etc/mysql/my.cnf
+    if [ ! -d /srv/mysql/data/mysql ]; then
+        echo "Moving mysql databases from /var/lib/mysql/ to /srv/mysql/data ..."
+        mv /var/lib/mysql/* /srv/mysql/data
     else
-        echo "Not moving mysql databases from /var/lib/mysql/ to /srv/mysql_data since data is already present there"
+        echo "Not moving mysql databases from /var/lib/mysql/ to /srv/mysql/data since data is already present there"
     fi
     service mysql start
     export MYSQL_PWD='root'
