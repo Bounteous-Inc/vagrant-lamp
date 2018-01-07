@@ -7,6 +7,7 @@ The following functions and aliases are available:
 \e[1mGENERAL:\e[0;32m
   mem               - Shows percentage of memory you have remaining in this VM environment
   vhelp             - Displays this help message
+  vstatus           - Displays info on running services and how much memory is in use
 
 
 \e[1mMYSQL:\e[0;32m

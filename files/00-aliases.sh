@@ -14,6 +14,15 @@ function vhelp {
   echo -e "$text"
 }
 
+function vstatus {
+  echo -e "\n\033[1;33mvstatus - Vagrant Status\033[0;33m"
+  echo -e "  Disk Used:      `df -h --output='pcent' / | tail -n1` (Vagrant) `df -h --output='pcent' /vagrant | tail -n1` (Host)"
+  echo -e "  `free | awk '/Mem/{printf(\"Memory used:     %.0f% (RAM)\"), $3/$2*100} /buffers\/cache/{printf(\"      %.0f% (Buffers)\"), 100-($4/($3+$4)*100)}'`"
+  echo -e "  Mysql Status:    $(if [[ $(sudo service mysql   status | grep 'running') != '' ]]; then echo '\033[1;32mOK\033[0m'; else echo '\033[1;31mStopped\033[0;33m'; fi)"
+  echo -e "  Apache2 Status:  $(if [[ $(sudo service apache2 status | grep 'running') != '' ]]; then echo '\033[1;32mOK\033[0m'; else echo '\033[1;31mStopped\033[0;33m'; fi)"
+  echo -e "\033[0m"
+}
+
 function m1m2 {
   if [ -e app/etc/local.xml ]; then
     echo 'M1';
@@ -151,7 +160,7 @@ function xdebug {
 }
 alias ll='ls -al'
 alias lh='ls -alh'
-alias mem='free | awk '\''/Mem/{printf("Memory used: %.2f%"), $3/$2*100} /buffers\/cache/{printf(", buffers: %.2f%\n"), $4/($3+$4)*100}'\'''
+alias mem='free | awk '\''/Mem/{printf("Memory used: %.2f%"), $3/$2*100} /buffers\/cache/{printf(", buffers: %.2f%\n"), 100-($4/($3+$4)*100)}'\'''
 alias sudo='sudo '
 alias www='cd /srv/www'
 
