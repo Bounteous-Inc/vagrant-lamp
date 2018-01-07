@@ -40,6 +40,9 @@ done </vagrant/files/hosts.txt
 mkdir -p /srv/backup/mysql
 mkdir -p /srv/backup/webconfig
 
+# Create folder for mysql data
+mkdir -p /erv/mysql/data
+
 # Copy bash aliases and welcome message for all users
 cp /vagrant/files/00-aliases.sh /etc/profile.d/
 cp /vagrant/files/99-welcome.sh /etc/profile.d/

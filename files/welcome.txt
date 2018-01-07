@@ -35,9 +35,9 @@ The following functions and aliases are available:
 ###php_versions###\e[0;32m
 
 \e[1mWEB:\e[0;32m
-  backupWebConfig   - Makes a dump of all your VHost configuration settings and SSL certificates into /srv/backup
+  backupWebconfig   - Makes a dump of all your VHost configuration settings and SSL certificates into /srv/backup
                       This is shared on your host machine so will survive a \e[33mvagrant destroy\e[0;32m
-  restoreWebConfig  - Restores all of your VHost configuration settings and SSL certificates from /srv/backup
+  restoreWebconfig  - Restores all of your VHost configuration settings and SSL certificates from /srv/backup
                       This is shared on your host machine so will survive a \e[33mvagrant destroy\e[0;32m
   www               - Changes to the /srv/www directory
 
