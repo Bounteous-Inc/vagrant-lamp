@@ -37,8 +37,8 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
 done </vagrant/files/hosts.txt
 
 # Create backup folders for mysql and web config
-mkdir -f /srv/backup/mysql
-mkdir -f /srv/backup/webconfig
+mkdir -p /srv/backup/mysql
+mkdir -p /srv/backup/webconfig
 
 # Copy bash aliases and welcome message for all users
 cp /vagrant/files/00-aliases.sh /etc/profile.d/
