@@ -51,10 +51,10 @@ if [ ! -d /opt/phpfarm ]; then
         sed -i "s/--with-png-dir/--with-png-dir \\\\\n--with-freetype-dir=\/usr\/include\/freetype2 \\\\\n--enable-gd-native-ttf/" /opt/phpfarm/custom/options-5.5.sh
     fi
     if [[ $(/opt/phpfarm/custom/options-5.6.sh | grep 'freetype')  == '' ]]; then
-        sed -i "s/--with-xsl/--with-png-dir \\\\\n--with-freetype-dir=\/usr\/include\/freetype2 \\\\\n--enable-gd-native-ttf/" /opt/phpfarm/custom/options-5.6.sh
+        sed -i "s/--with-xsl/--with-xsl \\\\\n--with-freetype-dir=\/usr\/include\/freetype2 \\\\\n--enable-gd-native-ttf/" /opt/phpfarm/custom/options-5.6.sh
     fi
     if [[ $(/opt/phpfarm/custom/options-7.sh | grep 'freetype')  == '' ]]; then
-        sed -i "s/--with-xsl/--with-png-dir \\\\\n--with-freetype-dir=\/usr\/include\/freetype2 \\\\\n--enable-gd-native-ttf/" /opt/phpfarm/custom/options-7.sh
+        sed -i "s/--with-xsl/--with-xsl \\\\\n--with-freetype-dir=\/usr\/include\/freetype2 \\\\\n--enable-gd-native-ttf/" /opt/phpfarm/custom/options-7.sh
     fi
 fi
 
