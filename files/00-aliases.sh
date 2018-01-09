@@ -15,11 +15,11 @@ function vhelp {
 }
 
 function vstatus {
-  echo -e "\n\033[1;33mvstatus - Vagrant Status\033[0;33m"
+  echo -e "\n\033[1;32mvstatus - Vagrant Status\033[0;32m"
   echo -e "  Disk Used:      `df -h --output='pcent' / | tail -n1` (Vagrant) `df -h --output='pcent' /vagrant | tail -n1` (Host)"
   echo -e "  `free | awk '/Mem/{printf(\"Memory used:     %.0f% (RAM)\"), $3/$2*100} /buffers\/cache/{printf(\"      %.0f% (Buffers)\"), 100-($4/($3+$4)*100)}'`"
-  echo -e "  Mysql Status:    $(if [[ $(sudo service mysql   status | grep 'is stopped')  == '' ]]; then echo '\033[1;32mOK\033[0;33m'; else echo '\033[1;31mStopped\033[0;33m'; fi)"
-  echo -e "  Apache2 Status:  $(if [[ $(sudo service apache2 status | grep 'not running') == '' ]]; then echo '\033[1;32mOK\033[0;33m'; else echo '\033[1;31mStopped\033[0;33m'; fi)"
+  echo -e "  Mysql Status:    $(if [[ $(sudo service mysql   status | grep 'is stopped')  == '' ]]; then echo '\033[1;32mOK\033[0;32m'; else echo '\033[1;31mStopped\033[0;32m'; fi)"
+  echo -e "  Apache2 Status:  $(if [[ $(sudo service apache2 status | grep 'not running') == '' ]]; then echo '\033[1;32mOK\033[0;32m'; else echo '\033[1;31mStopped\033[0;32m'; fi)"
   echo -e "\033[0m"
 }
 
@@ -43,7 +43,7 @@ function cac {
       ;;
     M2)
       echo 'Cache clear for M2';
-      php7 bin/magento cache:flush;
+      eval php7 bin/magento cache:flush;
       ;;
     *)
       echo $(m1m2);
