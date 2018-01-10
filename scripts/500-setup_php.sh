@@ -162,6 +162,6 @@ if ! grep -q "phpfarm" /etc/environment ; then
     echo "PATH="$PATH:/opt/phpfarm/inst/bin:/opt/phpfarm/inst/current/bin:/opt/phpfarm/inst/current/sbin"" >> /etc/environment
 fi
 
-# Set Default php to oldest available
-php_version=$(ls -1 /opt/phpfarm/inst/ | grep php | head -n1 | cut -d'-' -f2);
+# Set Default php to newest available
+php_version=$(ls -1 /opt/phpfarm/inst/ | grep php | tail -n1 | cut -d'-' -f2);
 /opt/phpfarm/inst/bin/switch-phpfarm ${php_version}
