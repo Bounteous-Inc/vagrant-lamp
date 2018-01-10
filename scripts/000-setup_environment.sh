@@ -20,30 +20,14 @@ mkdir -p /srv/backup/webconfig
 # Create folder for mysql data
 mkdir -p /srv/mysql/data
 
-
-
 apt-get update
 
-# Install git
-apt-get install -y git 2>&1
-
-# Install HTOP
-apt-get install -y htop 2>&1
-
-# Install smem
-apt-get install -y smem 2>&1
-
-# Install strace
-apt-get install -y strace 2>&1
-
-# Install lynx
-apt-get install -y lynx 2>&1
-
-# Install dos2unix
-apt-get install -y dos2unix 2>&1
+# Install git, tig, htop, smem, strace, lynx and dos2unix
+apt-get install -y git tig htop smem strace lynx dos2unix 2>&1
 
 # Correct non Unix line endings
 find /vagrant/files -type f -exec dos2unix {} \;
+dos2unix /vagrant/php_versions.sh
 
 # Setup Hosts file
 while IFS='' read -r line || [[ -n "$line" ]]; do
