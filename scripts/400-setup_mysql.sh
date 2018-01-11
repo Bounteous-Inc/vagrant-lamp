@@ -35,8 +35,17 @@ if [ ! -f /etc/init.d/mysql* ]; then
     echo "GRANT ALL PRIVILEGES ON *.* TO 'debian-sys-maint'@'localhost' IDENTIFIED BY '${debian_sys_maint_pwd}';" | mysql -u'root'
     export MYSQL_PWD=''
     service mysql restart
-    apt-get install -y percona-toolkit 2>&1
 fi
+
+# Make mysql's socket available to php - e.g. 
+# echo "<?php \$li = new mysqli('localhost', 'root', 'root', 'mysql'); ?>" | php
+if [ ! -L /tmp/mysql.sock ]; then
+    echo "Creating symbolic link for php to connect to mysql.sock"
+    ln -s /var/run/mysqld/mysqld.sock /tmp/mysql.sock
+fi
+
+apt-get install -y percona-toolkit 2>&1
+
 
 # Setup mysql-sync script
 yes | cp -rf /vagrant/files/mysql-sync.sh /usr/local/bin/mysql-sync
