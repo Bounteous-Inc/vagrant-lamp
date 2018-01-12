@@ -33,8 +33,6 @@ mounts_required.each do |required_folder|
   end
 end
 
-raise 'I am done here'
-
 if !Vagrant::Util::Platform.windows?
    check_plugins ["vagrant-bindfs"]
 end
