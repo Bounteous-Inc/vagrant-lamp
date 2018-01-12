@@ -1,5 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+mounts_required = Array.[]('/srv/www', '/srv/mysql', '/srv/backup')
 
 # Use config.yml for basic VM configuration.
 require 'yaml'
@@ -9,6 +10,31 @@ unless File.exist?("#{dir}/config.yml")
   raise 'Configuration file not found! Please copy example.config.yml to config.yml and try again.'
 end
 vconfig = YAML.load_file("#{dir}/config.yml")
+
+mounts_required.each do |required_folder|
+  found = false
+  vconfig['vagrant_synced_folders'].each do |synced_folder|
+    if synced_folder['destination'] == required_folder
+      found = true
+    end
+  end
+  if found == false
+    puts "\n" +
+      '**********************' + "\n" +
+      '* Demac Vagrant Lamp *' + "\n" +
+      '**********************' + "\n" +
+      'Your config.yml file must contain ' +
+      mounts_required.count.to_s +
+      ' vagrant_synced_folders entries' + "\n" +
+      'mapping to ' + mounts_required.to_s + "\n" +
+      "Please see example.config.yml for details on how to set this.\n" +
+      "\n"
+    exit
+  end
+end
+
+raise 'I am done here'
+
 if !Vagrant::Util::Platform.windows?
    check_plugins ["vagrant-bindfs"]
 end

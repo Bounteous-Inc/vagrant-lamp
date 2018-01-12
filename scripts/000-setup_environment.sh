@@ -3,13 +3,6 @@ echo "******************************"
 echo "* 000-setup_environment.sh   *"
 echo "******************************"
 
-if [ ! -d /srv/backup ] || [ ! -d /srv/mysql ] || [ ! -d /srv/www ]; then
-    echo -e "\033[1;31mError:\033[0;31m Your config.yml file must include shared mounted folders mapping to /srv/backup, /srv/mysql and /srv/www\033[0m"
-    echo -e "\033[0;31mPlease see example.config.yml for how to do set this up.\033[0m"
-    echo -e "\033[0;31mThe current operation has been aborted.\033[0m"
-    exit 1
-fi
-
 # Enable trace printing and exit on the first error
 set -ex
 
