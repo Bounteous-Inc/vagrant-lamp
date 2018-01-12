@@ -81,4 +81,6 @@ Vagrant.configure(2) do |config|
 
   config.vm.define vconfig['vagrant_machine_name']
 
+  config.vm.provision "shell", inline: "service mysql restart", run: "always"
+
 end
