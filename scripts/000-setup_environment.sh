@@ -20,7 +20,10 @@ apt-get install -y git tig htop smem strace lynx dos2unix 2>&1
 
 # Correct non Unix line endings
 find /vagrant/files -type f -exec dos2unix {} \;
-dos2unix /vagrant/php_versions.sh
+dos2unix /vagrant/config_php.sh
+dos2unix /vagrant/config_groups.sh
+dos2unix /vagrant/config_groups.sh
+
 
 # Setup Hosts file
 while IFS='' read -r line || [[ -n "$line" ]]; do
@@ -29,19 +32,15 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
   fi
 done </vagrant/files/hosts.txt
 
-# Create backup folders for mysql and web config
-mkdir -p /srv/backup/mysql
-mkdir -p /srv/backup/webconfig
-
-# Create folder for mysql data
-mkdir -p /srv/mysql/data
 
 # Copy bash aliases and welcome message for all users
 cp /vagrant/files/00-aliases.sh /etc/profile.d/
 cp /vagrant/files/99-welcome.sh /etc/profile.d/
 
 # Next line needed so that root will have access to these aliases
-echo "source /etc/profile.d/00-aliases.sh" >> /root/.bash_aliases
+if [ ! grep -q "source /etc/profile.d/00-aliases.sh" /root/.bash_aliases ] ; then
+  echo "source /etc/profile.d/00-aliases.sh" >> /root/.bash_aliases
+fi
 
 #Setup PHP compile pre-requisites
 apt-get install -y  build-essential libbz2-dev libmysqlclient-dev libxpm-dev libmcrypt-dev \

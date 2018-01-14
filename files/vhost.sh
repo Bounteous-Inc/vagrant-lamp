@@ -37,9 +37,10 @@ Options:
                        Will default to ServerName
 
 EOF_HELP
-    source /vagrant/php_versions.sh
-    local _versions=''
-    for i in "${php_versions[@]}"; do
+    local config_php
+    local _versions
+    source /vagrant/config_php.sh
+    for i in "${config_php[@]}"; do
         arr=(${i// / })
         phpn=${arr[1]}
         _versions="${_versions}${phpn}  "
@@ -223,8 +224,10 @@ function remove_vhost {
 }
 
 function parse_php_version {
-    source /vagrant/php_versions.sh
-    for i in "${php_versions[@]}"; do
+    local config_php
+    local i
+    source /vagrant/config_php.sh
+    for i in "${config_php[@]}"; do
         local arr=(${i// / })
         local phpv=${arr[0]}
         local phpn=${arr[1]}

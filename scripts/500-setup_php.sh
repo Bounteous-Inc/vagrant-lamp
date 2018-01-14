@@ -62,6 +62,7 @@ function setup_php() {
     # Making these local so they dopn't bleed out into the global scope
     local arr
     local conf
+    local config_php
     local expected
     local i
     local installed
@@ -73,12 +74,12 @@ function setup_php() {
     local processes
     local shortname
 
-    source /vagrant/php_versions.sh
+    source /vagrant/config_php.sh
 
-    # Remove any php version not currently shown in php_versions.sh
+    # Remove any php version not currently shown in config_php.sh
     for installed in $(ls -d /opt/phpfarm/inst/php-* | cut -d'/' -f5 | cut -d'-' -f2); do
         expected='no';
-        for i in "${php_versions[@]}"; do
+        for i in "${config_php[@]}"; do
             arr=(${i// / })
             if [ ${installed} == ${arr[0]} ]; then
                 expected='yes'
@@ -112,7 +113,7 @@ function setup_php() {
     done;
 
     # Add new versions of PHP 
-    for i in "${php_versions[@]}"; do
+    for i in "${config_php[@]}"; do
         arr=(${i// / })
         phpv=${arr[0]}
         phpn=${arr[1]}
@@ -163,5 +164,4 @@ if ! grep -q "phpfarm" /etc/environment ; then
 fi
 
 # Set Default php to newest available
-php_version=$(ls -1 /opt/phpfarm/inst/ | grep php | tail -n1 | cut -d'-' -f2);
-/opt/phpfarm/inst/bin/switch-phpfarm ${php_version}
+/opt/phpfarm/inst/bin/switch-phpfarm $(ls -1 /opt/phpfarm/inst/ | grep php | tail -n1 | cut -d'-' -f2);

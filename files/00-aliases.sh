@@ -1,7 +1,8 @@
 function vhelp {
-  source /vagrant/php_versions.sh
-  _versions=''
-  for i in "${php_versions[@]}"; do
+  local _versions=''
+  local config_php
+  source /vagrant/config_php.sh
+  for i in "${config_php[@]}"; do
     arr=(${i// / })
     phpv=${arr[0]}
     phpn=${arr[1]}
@@ -121,8 +122,9 @@ function restoreWebconfig {
 }
 
 function phpRestart() {
-  source /vagrant/php_versions.sh
-  for i in "${php_versions[@]}"; do
+  local config_php
+  source /vagrant/config_php.sh
+  for i in "${config_php[@]}"; do
     local arr=(${i// / })
     local phpn=${arr[1]}
     sudo service php-${phpn} restart
@@ -164,8 +166,8 @@ alias mem='free | awk '\''/Mem/{printf("Memory used: %.2f%"), $3/$2*100} /buffer
 alias sudo='sudo '
 alias www='cd /srv/www'
 
-source /vagrant/php_versions.sh
-for i in "${php_versions[@]}"; do
+source /vagrant/config_php.sh
+for i in "${config_php[@]}"; do
     arr=(${i// / })
     phpv=${arr[0]}
     phpn=${arr[1]}
