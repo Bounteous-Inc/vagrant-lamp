@@ -51,13 +51,6 @@ if [ ! -f /etc/init.d/mysql* ]; then
     export MYSQL_PWD=''
 fi
 
-# Make mysql's socket available to php - e.g. 
-# echo "<?php \$li = new mysqli('localhost', 'root', 'root', 'mysql'); ?>" | php
-if [ ! -L /tmp/mysql.sock ]; then
-    echo "Creating symbolic link for php to connect to mysql.sock"
-    ln -s /var/run/mysqld/mysqld.sock /tmp/mysql.sock
-fi
-
 apt-get install -y percona-toolkit 2>&1
 
 

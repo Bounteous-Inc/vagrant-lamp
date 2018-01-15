@@ -70,19 +70,27 @@ Vagrant.configure(2) do |config|
       rsync__args: ['--verbose', '--archive', '--delete', '-z', '--chmod=ugo=rwX'],
       id: synced_folder['id'],
       create: synced_folder.include?('create') ? synced_folder['create'] : false,
-      mount_options: synced_folder.include?('mount_options') ? synced_folder['mount_options'] : [],
-      owner: synced_folder['owner'] ? synced_folder['owner'] : 'vagrant',
-      group: synced_folder['group'] ? synced_folder['group'] : 'vagrant'
+      mount_options: synced_folder.include?('mount_options') ? synced_folder['mount_options'] : []
     }
+
+    owner = synced_folder['owner'] ? synced_folder['owner'] : 'vagrant'
+    group = synced_folder['group'] ? synced_folder['group'] : 'vagrant'
+
+    if synced_folder['type'] != 'nfs' || Vagrant::Util::Platform.windows?
+       options[:owner] = owner
+       options[:group] = group
+    end
+
     if synced_folder.include?('options_override')
       options = options.merge(synced_folder['options_override'])
     end
+
     if synced_folder['type'] == 'nfs' && !Vagrant::Util::Platform.windows?
       config.vm.synced_folder synced_folder['local_path'], '/nfs' + synced_folder['destination'], options
-      config.bindfs.bind_folder "/nfs" + synced_folder['destination'], synced_folder['destination'], :owner => "vagrant", :group => "vagrant", :'create-as-user' => true, :perms => "u=rwx:g=rwx:o=r", :'create-with-perms' => "u=rwx:g=rwx:o=r", :'chown-ignore' => true, :'chgrp-ignore' => true, :'chmod-ignore' => true
+      config.bindfs.bind_folder "/nfs" + synced_folder['destination'], synced_folder['destination'], :owner => owner, :group => group, :'create-as-user' => true, :perms => "u=rwx:g=rwx:o=r", :'create-with-perms' => "u=rwx:g=rwx:o=r", :'chown-ignore' => true, :'chgrp-ignore' => true, :'chmod-ignore' => true
     else
-	  config.vm.synced_folder synced_folder['local_path'], synced_folder['destination'], options
-	end
+      config.vm.synced_folder synced_folder['local_path'], synced_folder['destination'], options
+    end
   end
 
   # VirtualBox.
@@ -104,6 +112,10 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.define vconfig['vagrant_machine_name']
+
+  # Make mysql's socket available to php - e.g.
+  # echo "<?php \$li = new mysqli('localhost', 'root', 'root', 'mysql'); ?>" | php
+  config.vm.provision "shell", inline: "if [ ! -L /tmp/mysql.sock ]; then ln -s /var/run/mysqld/mysqld.sock /tmp/mysql.sock; fi", run: "always"
 
   config.vm.provision "shell", inline: "service mysql restart", run: "always"
 
