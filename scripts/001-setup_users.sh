@@ -31,13 +31,11 @@ function vagrant_groups() {
         fi
 
         if [ $(getent group ${group_name} | cut -d':' -f3) != ${group_newGID} ]; then
-           vagrant_services stop
            group_oldGID=$(getent group ${group_name} | cut -d':' -f3)
            echo "Remapping existing group ${group_name_padded:1:12} from GID ${group_oldGID} to GID ${group_newGID}"
            groupmod -g ${group_newGID} ${group_name}
            echo "Reassigning files and folders associated with old group id to the new one"
            $(find / -gid ${group_oldGID} '!' -type l -exec chgrp ${group_newGID} '{}' ';' 2>&1 | grep -v 'No such file or directory') || true
-           vagrant_services start
         fi
     done
 }
@@ -74,8 +72,8 @@ function vagrant_users() {
         user_comment=${arg[5]}
 
         if [ ${user_homeDir} == '-' ]; then user_homeDir_arg='-M' ; else user_homeDir_arg="-d ${user_homeDir}"         ; fi
-        if [ ${user_shell} == '-' ];   then user_shell_arg=''     ; else   user_shell_arg="-s ${user_shell}"           ; fi
-        if [ ${user_comment} == '-' ]; then user_comment_arg=''   ; else user_comment_arg="-c '${user_comment//-/ /}'" ; fi
+        if [ ${user_shell} == '-' ];   then user_shell_arg=' '    ; else   user_shell_arg="-s ${user_shell}"           ; fi
+        if [ ${user_comment} == '-' ]; then user_comment_arg=' '  ; else user_comment_arg="-c '${user_comment//-/ /}'" ; fi
 
         if [ ! $(id -u ${user_name}) ]; then
            echo "Creating new user ${user_name_padded:1:12} with uid ${user_newUID} and gid ${user_newGID}"           
@@ -83,13 +81,11 @@ function vagrant_users() {
         fi
 
         if [ $(id -u ${user_name}) != ${user_newUID} ]; then
-           vagrant_services stop
            user_oldUID=$(id -u ${user_name})
            echo "Remapping existing user ${user_name_padded:1:12} from UID ${user_oldUID} to UID ${user_newUID}"
            usermod -u ${user_newUID} ${user_name}
            echo "Reassigning files and folders associated with old user id to the new one"
            $(find / -uid ${user_oldUID} '!' -type l -exec chown ${user_newUID} '{}' ';' 2>&1 | grep -v 'No such file or directory') || true
-           vagrant_services start
         fi
 
         if [ $(id -g ${user_name}) != ${user_newGID} ]; then
@@ -113,6 +109,8 @@ function vagrant_services {
     done
 }
 
+vagrant_services stop
 vagrant_groups
 vagrant_users
+vagrant_services start
 
