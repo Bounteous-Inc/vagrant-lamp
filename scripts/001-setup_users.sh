@@ -34,9 +34,9 @@ function vagrant_groups() {
            vagrant_services stop
            group_oldGID=$(getent group ${group_name} | cut -d':' -f3)
            echo "Remapping existing group ${group_name_padded:1:12} from GID ${group_oldGID} to GID ${group_newGID}"
-           groupmod -g ${group_oldGID} ${group_name}
+           groupmod -g ${group_newGID} ${group_name}
            echo "Reassigning files and folders associated with old group id to the new one"
-           $(find / -gid ${group_oldGID} '!' -type l -exec chgrp ${group_newGID} '{}' ';') || true
+           $(find / -gid ${group_oldGID} '!' -type l -exec chgrp ${group_newGID} '{}' ';' 2>&1 | grep -v 'No such file or directory') || true
            vagrant_services start
         fi
     done
@@ -88,7 +88,7 @@ function vagrant_users() {
            echo "Remapping existing user ${user_name_padded:1:12} from UID ${user_oldUID} to UID ${user_newUID}"
            usermod -u ${user_newUID} ${user_name}
            echo "Reassigning files and folders associated with old user id to the new one"
-           $(find / -uid ${user_oldUID} '!' -type l -exec chown ${user_newUID} '{}' ';') || true
+           $(find / -uid ${user_oldUID} '!' -type l -exec chown ${user_newUID} '{}' ';' 2>&1 | grep -v 'No such file or directory') || true
            vagrant_services start
         fi
 
