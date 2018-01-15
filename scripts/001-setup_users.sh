@@ -73,11 +73,11 @@ function vagrant_users() {
 
         if [ "${user_homeDir}" == '-' ]; then user_homeDir_arg='-M' ; else user_homeDir_arg="-d ${user_homeDir}"         ; fi
         if [ "${user_shell}" == '-' ];   then user_shell_arg=' '    ; else   user_shell_arg="-s ${user_shell}"           ; fi
-        if [ "${user_comment}" == '-' ]; then user_comment_arg=' '  ; else user_comment_arg="-c '${user_comment//-/ /}'" ; fi
+        if [ "${user_comment}" == '-' ]; then user_comment_arg=' '  ; else user_comment_arg="-c '${user_comment//_/ }'"  ; fi
 
         if [ ! $(id -u ${user_name}) ]; then
            echo "Creating new user ${user_name_padded:0:10} with uid ${user_newUID} and gid ${user_newGID}"           
-           useradd -u ${user_newUID} -g ${user_newGID} ${user_homeDir_arg} ${user_comment_arg} ${user_shell_arg} ${user_name}
+           useradd -u ${user_newUID} -g ${user_newGID} ${user_homeDir_arg} ${user_shell_arg} ${user_name} ${user_homeDir_arg}
         fi
 
         if [ $(id -u ${user_name}) != ${user_newUID} ]; then
