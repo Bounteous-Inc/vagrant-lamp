@@ -8,12 +8,12 @@ set -ex
 
 function vagrant_groups() {
     local arr
-    local i
+    local config_groups
     local group_newGID
     local group_name
     local group_name_padded
     local group_oldGID
-    local config_groups
+    local i
 
     source /vagrant/config_groups.sh
 
@@ -31,17 +31,20 @@ function vagrant_groups() {
         fi
 
         if [ $(getent group ${group_name} | cut -d':' -f3) != ${group_newGID} ]; then
+           vagrant_services stop
            group_oldGID=$(getent group ${group_name} | cut -d':' -f3)
            echo "Remapping existing group ${group_name_padded:1:12} from GID ${group_oldGID} to GID ${group_newGID}"
            groupmod -g ${group_oldGID} ${group_name}
            echo "Reassigning files and folders associated with old group id to the new one"
-           find / -gid ${group_oldGID} ! -type l -exec chgrp ${group_newGID} {} \;
+           $(find / -gid ${group_oldGID} '!' -type l -exec chgrp ${group_newGID} '{}' ';') || true
+           vagrant_services start
         fi
     done
 }
 
 function vagrant_users() {
     local arr
+    local config_users
     local i
     local user_newUID
     local user_newGID
@@ -55,7 +58,6 @@ function vagrant_users() {
     local user_homeDir_arg
     local user_shell_arg
     local user_comment_arg
-    local config_users
 
     source /vagrant/config_users.sh
 
@@ -81,11 +83,13 @@ function vagrant_users() {
         fi
 
         if [ $(id -u ${user_name}) != ${user_newUID} ]; then
+           vagrant_services stop
            user_oldUID=$(id -u ${user_name})
            echo "Remapping existing user ${user_name_padded:1:12} from UID ${user_oldUID} to UID ${user_newUID}"
            usermod -u ${user_newUID} ${user_name}
            echo "Reassigning files and folders associated with old user id to the new one"
-           find / -uid ${user_oldUID} ! -type l -exec chusr ${user_newUID} {} \;
+           $(find / -uid ${user_oldUID} '!' -type l -exec chown ${user_newUID} '{}' ';') || true
+           vagrant_services start
         fi
 
         if [ $(id -g ${user_name}) != ${user_newGID} ]; then
@@ -97,5 +101,18 @@ function vagrant_users() {
     done
 }
 
+function vagrant_services {
+    local arr
+    local i
+    local services
+
+    services=('apache2 mysql redis-server varnish')
+    arr=(${services// / })
+    for i in "${arr[@]}"; do
+        sudo service ${i} ${1} || true
+    done
+}
+
 vagrant_groups
 vagrant_users
+
