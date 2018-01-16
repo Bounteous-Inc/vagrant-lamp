@@ -1,4 +1,7 @@
 .DS_Store
 .idea
 .vagrant
+/www
+/backup
+/mysql
 /config.yml

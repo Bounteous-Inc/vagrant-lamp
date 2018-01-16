@@ -12,11 +12,23 @@ vagrant_public_ip: ""
 # a 'type' of [nfs|rsync|smb] (leave empty for slow native shares). See
 # windows example for local_path C:\\www\\sites
 vagrant_synced_folders:
-  - local_path: ~/Sites/projects_directory
+  - local_path: ~/Sites/www
     destination: /srv/www
     type:
     create: true
 
+  - local_path: ~/Sites/mysql
+    destination: /srv/mysql
+    type:
+    create: true
+    owner: 500      # mysql user  not created yet, but will have this id when the box is provisioned
+    group: 500      # mysql group not created yet, but will have this id when the box is provisioned
+
+  - local_path: ~/Sites/backup
+    destination: /srv/backup
+    type:
+    create: true
+
 # Memory and CPU to use for this VM.
-vagrant_memory: 2048
+vagrant_memory: 4096
 vagrant_cpus: 2

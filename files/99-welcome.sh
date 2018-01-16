@@ -1,0 +1,2 @@
+vhelp
+vstatus

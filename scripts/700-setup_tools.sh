@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+echo "******************************"
+echo "* 700-setup_tools.sh         *"
+echo "******************************"
 
 # Enable trace printing and exit on the first error
 set -ex
@@ -6,7 +9,8 @@ set -ex
 # Setup Composer
 if [ ! -f /usr/local/bin/composer ]; then
     cd /tmp
-    curl -sS https://getcomposer.org/installer | /opt/phpfarm/inst/php-5.4.45/bin/php
+    php=/opt/phpfarm/inst/php-$(ls -1 /opt/phpfarm/inst/ | grep php | head -n1 | cut -d'-' -f2)/bin/php;
+    curl -sS https://getcomposer.org/installer | ${php}
     mv composer.phar /usr/local/bin/composer
     chmod +x /usr/local/bin/composer
 fi
@@ -19,7 +23,7 @@ if [ ! -f /usr/local/bin/n98 ]; then
     chmod +x /usr/local/bin/n98
 fi
 
-# Setup n98-magerun
+# Setup modman
 if [ ! -f /usr/local/bin/modman ]; then
     cd /tmp
     bash < <(curl -s -L https://raw.github.com/colinmollenhour/modman/master/modman-installer)
