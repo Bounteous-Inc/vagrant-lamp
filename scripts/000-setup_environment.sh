@@ -22,7 +22,7 @@ apt-get install -y git tig htop smem strace lynx dos2unix 2>&1
 find /vagrant/files -type f -exec dos2unix {} \;
 dos2unix /vagrant/config_php.sh
 dos2unix /vagrant/config_groups.sh
-dos2unix /vagrant/config_groups.sh
+dos2unix /vagrant/config_users.sh
 
 
 # Setup Hosts file

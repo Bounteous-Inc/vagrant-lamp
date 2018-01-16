@@ -33,7 +33,7 @@ function vagrant_groups() {
            echo "Remapping existing group ${group_name} from GID ${group_oldGID} to GID ${group_newGID}"
            groupmod -g ${group_newGID} ${group_name}
            echo "Reassigning files and folders associated with old group id to the new one"
-           $(find / -gid ${group_oldGID} '!' -type l -exec chgrp ${group_newGID} '{}' ';' 2>&1 | grep -v 'No such file or directory') || true
+           $(find / -path "/srv/www" -prune -o -gid ${group_oldGID} '!' -type l -exec chgrp ${group_newGID} '{}' ';' 2>&1 | grep -v 'No such file or directory') || true
         fi
     done
 }
@@ -81,7 +81,7 @@ function vagrant_users() {
            echo "Remapping existing user ${user_name} from UID ${user_oldUID} to UID ${user_newUID}"
            usermod -u ${user_newUID} ${user_name}
            echo "Reassigning files and folders associated with old user id to the new one"
-           $(find / -uid ${user_oldUID} '!' -type l -exec chown ${user_newUID} '{}' ';' 2>&1 | grep -v 'No such file or directory') || true
+           $(find / -path "/srv/www" -prune -o -uid ${user_oldUID} '!' -type l -exec chown ${user_newUID} '{}' ';' 2>&1 | grep -v 'No such file or directory') || true
         fi
 
         if [ $(id -g ${user_name}) != ${user_newGID} ]; then
@@ -97,7 +97,7 @@ function vagrant_services {
     local i
     local services
 
-    services=('apache2 mysql redis-server varnish')
+    services=('apache2 redis-server varnish')
     arr=(${services// / })
     for i in "${arr[@]}"; do
         sudo service ${i} ${1} || true
