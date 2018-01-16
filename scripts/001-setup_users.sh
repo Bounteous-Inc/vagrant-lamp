@@ -97,7 +97,7 @@ function vagrant_services {
     local i
     local services
 
-    services=('apache2 redis-server varnish')
+    services=('apache2 mysql redis-server varnish')
     arr=(${services// / })
     for i in "${arr[@]}"; do
         sudo service ${i} ${1} || true
