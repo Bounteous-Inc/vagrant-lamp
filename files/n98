@@ -1,0 +1,10 @@
+#!/bin/bash
+if [ -e app/etc/local.xml ]; then
+  echo -e "\n\e[1;33mMagento M1 detected:\e[0;33m starting n98-magerun\e[0m";
+  n98-1 "$@"
+elif [ -e app/etc/env.php ]; then
+  echo -e "\n\e[1;33mMagento M2 detected:\e[0;33m starting n98-magerun2\e[0m";
+  n98-2 "$@"
+else
+  echo -e "\n\e[1;31mERROR:\e[0;31m Cannot determine magento version in use at '`pwd`'\e[0m";
+fi;

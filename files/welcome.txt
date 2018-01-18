@@ -23,9 +23,10 @@ The following functions and aliases are available:
   err               - Shows last error report (if any)
   getMSetting       - Get any setting from magento's local.xml or env.php - e.g. from magento base folder:
                         \e[33mgetMSetting 'dbname'\e[0;32m
-  m1m2              - Identifies if your instance is M1 or M2
-  n98               - The n98-magerun tool is available for you to use from any magento website home directory
-  templateHelp 0|1  - Enables / disables template help (M1 only)
+  m1m2              - Identifies whether your instance is M1 or M2
+  n98               - The n98-magerun / n98-magerun2 tools are available for you to use from any magento website home directory
+                        \e[33mn98\e[0;32m will choose the correct one for you automatically -
+                        e.g. \e[33mn98 sys:info\e[0;32m shows system info for both M1 or M2 systems
 
 
 \e[1mPHP:\e[0;32m

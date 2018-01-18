@@ -15,11 +15,20 @@ if [ ! -f /usr/local/bin/composer ]; then
     chmod +x /usr/local/bin/composer
 fi
 
-# Setup n98-magerun
-if [ ! -f /usr/local/bin/n98 ]; then
+# Set up n98 for M1, M2 and automatic selection based on platform in use
+if [ ! -f /usr/local/bin/n98 ] || [ ! -f /usr/local/bin/n98-1 ] || [ ! -f /usr/local/bin/n98-2 ]; then
     cd /tmp
+    rm -f n98-magerun*
+
     wget --progress=bar:force https://files.magerun.net/n98-magerun.phar
-    mv n98-magerun.phar /usr/local/bin/n98
+    mv n98-magerun.phar /usr/local/bin/n98-1
+    chmod +x /usr/local/bin/n98-1
+
+    wget --progress=bar:force https://files.magerun.net/n98-magerun2.phar
+    mv n98-magerun2.phar /usr/local/bin/n98-2
+    chmod +x /usr/local/bin/n98-2
+
+    cp /vagrant/files/n98 /usr/local/bin/n98
     chmod +x /usr/local/bin/n98
 fi
 
