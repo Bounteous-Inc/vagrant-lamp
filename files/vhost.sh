@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Version 1.0.3
+# Version 1.0.2
 #
 # Show Usage, Output to STDERR
 #
 function show_header {
     echo -e "\e[32m"
     echo -e "***********************"
-    echo -e "* vhost version 1.0.3 *"
+    echo -e "* vhost version 1.0.2 *"
     echo -e "***********************\e[0m"
 }
 
