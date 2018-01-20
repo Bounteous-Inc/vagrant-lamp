@@ -1,12 +1,27 @@
 #!/usr/bin/env bash
-# Version 1.0.2
+# Version 1.0.3
 #
 # Show Usage, Output to STDERR
 #
-function show_usage {
-    local help=''
-    read -r -d '' help << EOF_HELP
+function show_header {
+    echo -e "\e[32m"
+    echo -e "***********************"
+    echo -e "* vhost version 1.0.3 *"
+    echo -e "***********************\e[0m"
+}
 
+function show_usage {
+    local help
+    local config_php
+    local _versions
+    source /vagrant/config_php.sh
+    for i in "${config_php[@]}"; do
+        arr=(${i// / })
+        phpn=${arr[1]}
+        _versions="${_versions}${phpn}  "
+    done;
+
+    read -r -d '' help << EOF_HELP
 Create or Remove vHost in Ubuntu Server
 Assumes PHP-FPM with proxy_fcgi and /etc/apache2/sites-available and /etc/apache2/sites-enabled setup are used
 
@@ -16,6 +31,8 @@ Options:
   -h Help            : Show this menu.
   -n ServerName      : Domain i.e. example.com or sub.example.com or 'js.example.com static.example.com'
   -a ServerAlias     : Alias i.e. *.example.com or another domain altogether OPTIONAL
+                       You can now add multiple aliases for any given site, e.g.
+                       -a www.example.com -a example.ca -a www.example.ca
   -p PHPVersion      : PHP Version:
                        choose one of these:  ###php_versions###
   -s CertPath        : ***SELF SIGNED CERTIFICATE ARE AUTOMATICALLY CREATED FOR EACH VHOST USE THIS TO OVERRIDE***
@@ -36,17 +53,13 @@ Options:
                        Certificate Name "example.com" becomes "example.com.key" and "example.com.crt". OPTIONAL
                        Will default to ServerName
 
+
+
+
+
 EOF_HELP
-    local config_php
-    local _versions
-    source /vagrant/config_php.sh
-    for i in "${config_php[@]}"; do
-        arr=(${i// / })
-        phpn=${arr[1]}
-        _versions="${_versions}${phpn}  "
-    done;
-    echo "$help" | sed "s/###php_versions###/${_versions}/g";
-    exit 1
+    echo "$help" | sed "s/###php_versions###/${_versions}/g"
+    echo ""
 }
 
 #
@@ -57,8 +70,9 @@ function create_vhost {
 cat <<- _EOF_
 <VirtualHost *:8090>
     ServerAdmin webmaster@localhost
-    ServerName $ServerName
-    $ServerAlias
+    ServerName  $ServerName
+
+    ###ServerAlias###
 
     DocumentRoot $DocumentRoot
 
@@ -92,8 +106,9 @@ function create_ssl_vhost {
 cat <<- _EOF_
 <VirtualHost *:443>
     ServerAdmin webmaster@localhost
-    ServerName $ServerName
-    $ServerAlias
+    ServerName  $ServerName
+
+    ###ServerAlias###
 
     # PHP proxy specifications
     <Proxy fcgi://127.0.0.1:$PhpPort>
@@ -138,6 +153,7 @@ _EOF_
 
 function confirm () {
     # call with a prompt string or use a default
+    echo -e "\e[34m"
     read -r -p "${1:-Are you sure? [y/N]} " response
     case ${response} in
         [yY][eE][sS]|[yY])
@@ -147,15 +163,10 @@ function confirm () {
             false
             ;;
     esac
+    echo -e "\e[0m"
 }
 
 function add_vhost {
-
-    # If alias is set:
-    if [ "$Alias" != "" ]; then
-        ServerAlias="ServerAlias "$Alias
-    fi
-
     # If CertName doesn't get set, set it to ServerName
     if [ "$CertName" == "" ]; then
         CertName=$ServerName
@@ -176,7 +187,7 @@ function add_vhost {
         #chown USER:USER $DocumentRoot #POSSIBLE IMPLEMENTATION, new flag -u ?
     fi
 
-    create_vhost > /etc/apache2/sites-available/200-${ServerName}.conf
+    create_vhost | sed "s/###ServerAlias###/${ServerAlias}/g" > /etc/apache2/sites-available/200-${ServerName}.conf
 
     # Make directory to place SSL Certificate if it doesn't exists
     if [[ ! -d $KeyPath ]]; then
@@ -192,14 +203,14 @@ function add_vhost {
         -reqexts SAN -extensions SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=DNS:$ServerName")) \
         -subj "/C=CA/ST=Ontario/L=Toronto/O=Demac Media/OU=Development/CN=$ServerName"
     elif [ -f "$CertPath/$ServerName.crt" ] && [ -f "$KeyPath/$ServerName.key" ]; then
-        if confirm "Key $KeyPath/$ServerName.key and CRT $CertPath/$ServerName.crt already exists. Remove and Recreate? [y/N]" ; then
+        if confirm "SSL Key and certificate for $ServerName already exist. Recreate them? [y/N]" ; then
             openssl req -x509 -nodes -newkey rsa:2048 -keyout "$KeyPath/$ServerName.key" -out "$CertPath/$ServerName.crt" -days 365 \
             -reqexts SAN -extensions SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=DNS:$ServerName")) \
             -subj "/C=CA/ST=Ontario/L=Toronto/O=Demac Media/OU=Development/CN=$ServerName"
         fi
     fi
 
-    create_ssl_vhost >> /etc/apache2/sites-available/200-${ServerName}.conf
+    create_ssl_vhost | sed "s/###ServerAlias###/${ServerAlias}/g" >> /etc/apache2/sites-available/200-${ServerName}.conf
 
     # Enable Site
     cd /etc/apache2/sites-available/ && a2ensite 200-${ServerName}.conf
@@ -208,18 +219,29 @@ function add_vhost {
     if ! grep -q "127.0.0.1 $ServerName" /etc/hosts ; then
       echo "127.0.0.1 $ServerName" >> /etc/hosts
     fi
+
+    echo ""
     service apache2 reload
 }
 
 function remove_vhost {
-    if [ ! -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
+    if [ ! -f "/etc/apache2/sites-available/$ServerName.conf" ] && [ ! -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
         echo "vHost $ServerName not found. Aborting"
         show_usage
     fi
+
+    # Remove legacy non-prefixed version first:
+    if [ -f "/etc/apache2/sites-enabled/$ServerName.conf" ]; then
+        cd /etc/apache2/sites-available/ && a2dissite ${ServerName}.conf
+        rm /etc/apache2/sites-available/${ServerName}.conf
+    fi
+
+    # Remove new prefixed version next:
     if [ -f "/etc/apache2/sites-enabled/200-$ServerName.conf" ]; then
         cd /etc/apache2/sites-available/ && a2dissite 200-${ServerName}.conf
+        rm /etc/apache2/sites-available/200-${ServerName}.conf
     fi
-    rm /etc/apache2/sites-available/200-${ServerName}.conf
+
     service apache2 reload
 }
 
@@ -264,6 +286,7 @@ for arg in "$@"; do
 done
 
 #Parse flags
+ServerAlias=""
 while getopts "d:s:k:a:p:n:c:h:AR" OPTION; do
     case $OPTION in
         h)
@@ -276,7 +299,9 @@ while getopts "d:s:k:a:p:n:c:h:AR" OPTION; do
             ServerName=$OPTARG
             ;;
         a)
-            Alias=$OPTARG
+            if [[ $(echo "${ServerAlias}" | grep ${OPTARG}) == '' ]]; then
+                ServerAlias+="ServerAlias ${OPTARG}\n    "
+            fi
             ;;
         p)
             PhpVersion=$OPTARG
@@ -302,24 +327,32 @@ while getopts "d:s:k:a:p:n:c:h:AR" OPTION; do
     esac
 done
 
+show_header
 if [ "$(id -u)" != "0" ]; then
-    echo "Must be ran with 'sudo' or as root!! Aborting"
     show_usage
+    if [ "$Task" == 'add' ] || [ "$Task" == 'remove' ]; then
+        echo -e "\e[31mMust be run with 'sudo' or as root!! Aborting\e[0m"
+    fi
+    exit 1
 elif [ "$Task" = "add" ] ; then
-	if [ "$ServerName" = "" ] ; then
-        echo "Missing Server Name!! Aborting "
-		show_usage
+    if [ "$ServerName" = "" ] ; then
+        show_usage
+        echo -e "\e[31mMissing Server Name!! Aborting\e[0m"
+        exit 1        
     elif [ "$DocumentRoot" == "" ]; then
-        echo 'DocumentRoot must be set!! Aborting'
         show_usage
+        echo -e "\e[31mDocumentRoot must be set!! Aborting\e[0m"
+        exit 1
     elif [ "$CertPath" != "" ] && [ "$KeyPath" == "" ]; then
-        echo 'When supplying CertPath, KeyPath must also be supplied!! Aborting'
         show_usage
+        echo -e "\e[31mWhen supplying CertPath, KeyPath must also be supplied!! Aborting\e[0m"
+        exit 1
     elif [ "$CertPath" == "" ] && [ "$KeyPath" != "" ]; then
-        echo 'When supplying KeyPath, CertPath must also be supplied!! Aborting'
         show_usage
-    elif [ -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
-        if confirm "vHost $ServerName already exists. Remove and Recreate? [y/N]" ; then
+        echo -e "\e[31mWhen supplying KeyPath, CertPath must also be supplied!! Aborting\e[0m"
+        exit 1
+    elif [ -f "/etc/apache2/sites-available/$ServerName.conf" ] || [ -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
+        if confirm "vHost $ServerName already exists. Remove and Recreate it? [y/N]" ; then
             remove_vhost
         else
             exit 1
@@ -329,10 +362,12 @@ elif [ "$Task" = "add" ] ; then
     add_vhost
 elif [ "$Task" = "remove" ] ; then
     if [ "$ServerName" = "" ] ; then
-        echo "Missing Server Name!! Aborting "
-		show_usage
+        show_usage
+        echo -e "\e[31mMissing Server Name!! Aborting\e[0m"
+        exit 1
     fi
     confirm "Remove vHost $ServerName? [y/N]" && remove_vhost
 else
-	show_usage
+    show_usage
+    exit 1
 fi
