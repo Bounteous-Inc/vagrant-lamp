@@ -12,14 +12,7 @@ function show_header {
 
 function show_usage {
     local help
-    local config_php
-    local _versions
-    source /vagrant/config_php.sh
-    for i in "${config_php[@]}"; do
-        arr=(${i// / })
-        phpn=${arr[1]}
-        _versions="${_versions}${phpn}  "
-    done;
+    local _versions=$(get_php_versions)
 
     read -r -d '' help << EOF_HELP
 Create or Remove vHost in Ubuntu Server
@@ -34,7 +27,7 @@ Options:
                        You can now add multiple aliases for any given site, e.g.
                        -a www.example.com -a example.ca -a www.example.ca
   -p PHPVersion      : PHP Version:
-                       choose one of these:  ###php_versions###
+                       choose one of these:  [###php_versions###]
   -s CertPath        : ***SELF SIGNED CERTIFICATE ARE AUTOMATICALLY CREATED FOR EACH VHOST USE THIS TO OVERRIDE***
                        File path to the SSL certificate. Directories only, no file name. OPTIONAL
                        If using an SSL Certificate, also creates a port :443 vhost as well.
@@ -61,6 +54,19 @@ EOF_HELP
     echo "$help" | sed "s/###php_versions###/${_versions}/g"
     echo ""
 }
+
+
+function get_php_versions {
+    local config_php
+    source /vagrant/config_php.sh
+    for i in "${config_php[@]}"; do
+        arr=(${i// / })
+        phpn=${arr[1]}
+        _versions="${_versions}${phpn}|"
+    done;
+    echo "${_versions:0:-1}"
+}
+
 
 #
 #   Output vHost skeleton, fill with userinput
@@ -153,8 +159,8 @@ _EOF_
 
 function confirm () {
     # call with a prompt string or use a default
-    echo -e "\e[34m"
-    read -r -p "${1:-Are you sure? [y/N]} " response
+    echo -en "\n\e[33m${1:-Are you sure? [y/N]}\e[0m"
+    read -r -p ' ' response
     case ${response} in
         [yY][eE][sS]|[yY])
             true
@@ -163,7 +169,6 @@ function confirm () {
             false
             ;;
     esac
-    echo -e "\e[0m"
 }
 
 function add_vhost {
@@ -226,8 +231,8 @@ function add_vhost {
 
 function remove_vhost {
     if [ ! -f "/etc/apache2/sites-available/$ServerName.conf" ] && [ ! -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
-        echo "vHost $ServerName not found. Aborting"
-        show_usage
+        show_error "vHost $ServerName not found.  Aborting."
+        exit 1
     fi
 
     # Remove legacy non-prefixed version first:
@@ -259,9 +264,14 @@ function parse_php_version {
         fi
     done;
     if [ -z ${PhpPort+x} ]; then
-        echo 'Invalid PHP Version. Aborting'
-        show_usage
+        show_error "Unsupported PHP version [$PhpVersion].  Supported versions are: [$(get_php_versions)].  Aborting."
+        exit 1
     fi
+}
+
+function show_error {
+    show_usage
+    echo -e "\e[31m${1}\e[0m"
 }
 
 # Set Defaults
@@ -329,29 +339,27 @@ done
 
 show_header
 if [ "$(id -u)" != "0" ]; then
-    show_usage
     if [ "$Task" == 'add' ] || [ "$Task" == 'remove' ]; then
-        echo -e "\e[31mMust be run with 'sudo' or as root!! Aborting\e[0m"
+        show_error "Must be run with 'sudo' or as root.  Aborting."
+        exit 1
     fi
+    show_usage
     exit 1
 elif [ "$Task" = "add" ] ; then
     if [ "$ServerName" = "" ] ; then
-        show_usage
-        echo -e "\e[31mMissing Server Name!! Aborting\e[0m"
-        exit 1        
+        show_error "Missing Server Name.  Aborting."
+        exit 1
     elif [ "$DocumentRoot" == "" ]; then
-        show_usage
-        echo -e "\e[31mDocumentRoot must be set!! Aborting\e[0m"
+        show_error "DocumentRoot must be set.  Aborting."
         exit 1
     elif [ "$CertPath" != "" ] && [ "$KeyPath" == "" ]; then
-        show_usage
-        echo -e "\e[31mWhen supplying CertPath, KeyPath must also be supplied!! Aborting\e[0m"
+        show_error "When supplying CertPath, KeyPath must also be supplied.  Aborting."
         exit 1
     elif [ "$CertPath" == "" ] && [ "$KeyPath" != "" ]; then
-        show_usage
-        echo -e "\e[31mWhen supplying KeyPath, CertPath must also be supplied!! Aborting\e[0m"
+        show_error "When supplying KeyPath, CertPath must also be supplied.  Aborting."
         exit 1
     elif [ -f "/etc/apache2/sites-available/$ServerName.conf" ] || [ -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
+        parse_php_version
         if confirm "vHost $ServerName already exists. Remove and Recreate it? [y/N]" ; then
             remove_vhost
         else
@@ -362,8 +370,7 @@ elif [ "$Task" = "add" ] ; then
     add_vhost
 elif [ "$Task" = "remove" ] ; then
     if [ "$ServerName" = "" ] ; then
-        show_usage
-        echo -e "\e[31mMissing Server Name!! Aborting\e[0m"
+        show_error "Missing Server Name.  Aborting."
         exit 1
     fi
     confirm "Remove vHost $ServerName? [y/N]" && remove_vhost
