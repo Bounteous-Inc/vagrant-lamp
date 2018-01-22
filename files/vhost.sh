@@ -18,7 +18,7 @@ function show_usage {
 Create or Remove vHost in Ubuntu Server
 Assumes PHP-FPM with proxy_fcgi and /etc/apache2/sites-available and /etc/apache2/sites-enabled setup are used
 
-Usage: sudo vhost add|remove -d DocumentRoot -n ServerName -p PhpVersion [-a ServerAlias] [-s CertPath] [-c CertName]
+Usage: sudo vhost add|remove -d DocumentRoot -n ServerName -p PhpVersion [-a ServerAlias] [-s CertPath] [-c CertName] [-f]
 Options:
   -d DocumentRoot    : DocumentRoot i.e. /var/www/yoursite
   -h Help            : Show this menu.
@@ -45,7 +45,7 @@ Options:
   -c CertName        : ***SELF SIGNED CERTIFICATE ARE AUTOMATICALLY CREATED FOR EACH VHOST USE THIS TO OVERRIDE***
                        Certificate Name "example.com" becomes "example.com.key" and "example.com.crt". OPTIONAL
                        Will default to ServerName
-
+  -f                 : Force mode - silently reponds 'yes' to any confirmation messages
 
 
 
@@ -62,7 +62,7 @@ function get_php_versions {
     for i in "${config_php[@]}"; do
         arr=(${i// / })
         phpn=${arr[1]}
-        _versions="${_versions}${phpn}|"
+        _versions="${_versions}${phpn} "
     done;
     echo "${_versions:0:-1}"
 }
@@ -158,17 +158,21 @@ _EOF_
 }
 
 function confirm () {
-    # call with a prompt string or use a default
-    echo -en "\n\e[33m${1:-Are you sure? [y/N]}\e[0m"
-    read -r -p ' ' response
-    case ${response} in
-        [yY][eE][sS]|[yY])
-            true
-            ;;
-        *)
-            false
-            ;;
-    esac
+    if [ "$Force" = "y" ]; then
+        true
+    else
+        # call with a prompt string or use a default
+        echo -en "\n\e[33m${1:-Are you sure? [y/N]}\e[0m"
+        read -r -p ' ' response
+        case ${response} in
+            [yY][eE][sS]|[yY])
+                true
+                ;;
+            *)
+                false
+                ;;
+        esac
+    fi
 }
 
 function add_vhost {
@@ -278,6 +282,7 @@ function show_error {
 CertPath=""
 KeyPath=""
 ServerAlias=""
+force="n"
 
 # Transform long options to short ones
 for arg in "$@"; do
@@ -297,7 +302,8 @@ done
 
 #Parse flags
 ServerAlias=""
-while getopts "d:s:k:a:p:n:c:h:AR" OPTION; do
+Force='n'
+while getopts "d:s:k:a:p:n:c:h:ARf" OPTION; do
     case $OPTION in
         h)
             show_usage
@@ -330,6 +336,9 @@ while getopts "d:s:k:a:p:n:c:h:AR" OPTION; do
             ;;
         R)
             Task="remove"
+            ;;
+        f)
+            Force="y"
             ;;
         *)
             show_usage
@@ -371,6 +380,10 @@ elif [ "$Task" = "add" ] ; then
 elif [ "$Task" = "remove" ] ; then
     if [ "$ServerName" = "" ] ; then
         show_error "Missing Server Name.  Aborting."
+        exit 1
+    fi
+    if [ ! -f "/etc/apache2/sites-available/$ServerName.conf" ] && [ ! -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
+        show_error "vHost $ServerName not present"
         exit 1
     fi
     confirm "Remove vHost $ServerName? [y/N]" && remove_vhost
