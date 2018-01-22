@@ -53,7 +53,7 @@ function upgrade_vhosts() {
         echo "No legacy vhosts to upgrade"
     else
         echo "Upgrading legacy vhosts to support SSL"
-        configs="$(ls -1 /etc/apache2/sites-enabled/*.conf | grep '00-' -v)":-''
+        configs="$(ls -1 /etc/apache2/sites-enabled/*.conf | grep '00-' -v)"
         source /vagrant/config_php.sh
         for config in ${configs[@]} ; do
             filename=${config}
