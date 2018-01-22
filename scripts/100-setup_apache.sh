@@ -49,38 +49,43 @@ function upgrade_vhosts() {
     fi
 
     # Find all legacy site configs not prefixed with n00-
-    configs="$(ls -1 /etc/apache2/sites-enabled/*.conf | grep '00-' -v)";
-    source /vagrant/config_php.sh
-    for config in ${configs[@]} ; do
-        filename=${config}
-        file=$(cat $filename)
-        a=$(echo "$file" | grep 'ServerAlias' | head -n1 | xargs | cut -d' ' -f2)
-        d=$(echo "$file" | grep 'DocumentRoot' | head -n1 | xargs | cut -d' ' -f2)
-        n=$(echo "$file" | grep 'ServerName ' | head -n1 | xargs | cut -d' ' -f2)
-        port=$(echo "$file" | grep '<Proxy fcgi://127.0.0.1:' | xargs | head -n1 | cut -d':' -f3 | cut -d'>' -f1)
-        p='?'
-        for i in "${config_php[@]}"; do
-            arr=(${i// / })
-            phpv=${arr[0]}
-            phpn=${arr[1]}
-            phpp=${arr[2]}
-            if [ "${port}" = "${phpp}" ]; then
-                p=${phpn}
-            fi
-        done;
-        echo "Upgrading existing vhost ${filename}..."
-        if [ "$p" = "?" ]; then
-            echo "Unsupported PHP version for port ${port}"
-        else
-            if [ "$a" = "" ]; then
-                echo "vhost add -d $d -n $n -p $p -f"
-                vhost add -d $d -n $n -p $p -f
+    if [ ' '$(ls -1 /etc/apache2/sites-enabled/*.conf | grep '00-' -v) = ' ' ]; then
+        echo "No legacy vhosts to upgrade"
+    else
+        echo "Upgrading legacy vhosts to support SSL"
+        configs="$(ls -1 /etc/apache2/sites-enabled/*.conf | grep '00-' -v)":-''
+        source /vagrant/config_php.sh
+        for config in ${configs[@]} ; do
+            filename=${config}
+            file=$(cat $filename)
+            a=$(echo "$file" | grep 'ServerAlias' | head -n1 | xargs | cut -d' ' -f2)
+            d=$(echo "$file" | grep 'DocumentRoot' | head -n1 | xargs | cut -d' ' -f2)
+            n=$(echo "$file" | grep 'ServerName ' | head -n1 | xargs | cut -d' ' -f2)
+            port=$(echo "$file" | grep '<Proxy fcgi://127.0.0.1:' | xargs | head -n1 | cut -d':' -f3 | cut -d'>' -f1)
+            p='?'
+            for i in "${config_php[@]}"; do
+                arr=(${i// / })
+                phpv=${arr[0]}
+                phpn=${arr[1]}
+                phpp=${arr[2]}
+                if [ "${port}" = "${phpp}" ]; then
+                    p=${phpn}
+                fi
+            done;
+            echo "Upgrading existing vhost ${filename}..."
+            if [ "$p" = "?" ]; then
+                echo "Unsupported PHP version for port ${port}"
             else
-                echo "vhost add -d $d -n $n -p $p -a $a -f"
-                vhost add -d $d -n $n -p $p -a $a -f
+                if [ "$a" = "" ]; then
+                    echo "vhost add -d $d -n $n -p $p -f"
+                    vhost add -d $d -n $n -p $p -f
+                else
+                    echo "vhost add -d $d -n $n -p $p -a $a -f"
+                    vhost add -d $d -n $n -p $p -a $a -f
+                fi
             fi
-        fi
-    done;
+        done
+    fi
 }
 
 upgrade_vhosts
