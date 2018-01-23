@@ -1,5 +1,7 @@
 # Demac Flavoured vagrant-lamp
 
+Jump to [Goal](#goal) | [Requirements](#requirements) | [Setup](#setup) | [Configuration](#configuration) | [Change History](#change-history)
+
 ### Goal
 The goal of this project is to create an easy to use, reliable development environment.
 This was built as a MAMP/WAMP replacement, meeting the requirements of Magento 1 & 2
@@ -24,38 +26,54 @@ specifically.
     # Run Vagrant Up to download and setup the VM
     vagrant up
 
-###Configuration
+### Configuration
 -   Guest Host Entries:
     -   Add host entries to files/hosts.txt to have them added to Guest machine on provisioning
 -   config.yml settings
-    -   vagrant_hostname: Hostname on Guest VM `OPTIONAL - can leave default demacvm.dev`
-    -   vagrant_machine_name: Vagrant Machine Name, used for creating unique VM `OPTIONAL - can leave default demacvm`
-    -   vagrant_ip: IP addressed used to access Guest VM from Local machine `OPTIONAL - can leave default 192.168.33.10`
-    -   vagrant_public_ip: Public IP address of VM `OPTIONAL - recommended leave defualt empty`
+    -   vagrant_hostname: Hostname on Guest VM
+        OPTIONAL - can leave default `demacvm.dev`
+    -   vagrant_machine_name: Vagrant Machine Name, used for creating unique VM
+        OPTIONAL - can leave default `demacvm`
+    -   vagrant_ip: IP addressed used to access Guest VM from Local machine
+        OPTIONAL - can leave default `192.168.33.10`
+    -   vagrant_public_ip: Public IP address of VM
+        OPTIONAL - recommended leave defualt `empty`
     -   vagrant_synced_folders: Shared Folders from HOST machine to Guest
         -   local_path: Path on Host machine to share
         -   destination: Path on Guest machine to mount share
-        -   type: Share Type \[[nfs](https://www.vagrantup.com/docs/synced-folders/nfs.html)|[smb](https://www.vagrantup.com/docs/synced-folders/smb.html)|[rsync](https://www.vagrantup.com/docs/synced-folders/rsync.html)\] `OPTIONAL - recommended leave defualt empty`
-        -   create: Create directory on HOST machine if it doesn't exist `OPTIONAL - recommended leave defualt true`
+        -   type: Share Type \[[nfs](https://www.vagrantup.com/docs/synced-folders/nfs.html)|[smb](https://www.vagrantup.com/docs/synced-folders/smb.html)|[rsync](https://www.vagrantup.com/docs/synced-folders/rsync.html)\]
+            OPTIONAL - recommended leave default as empty.  Mac OS users may use nfs but not recommended for the mysql share as nfs bind may run out of connections
+        -   create: Create directory on HOST machine if it doesn't exist
+            OPTIONAL - recommended leave default `true`
         ```
-        #Example of Multiple Shared Folders
+        # Example of Multiple Shared Folders
         vagrant_synced_folders:
-          - local_path: ~/Sites/projects_directory
+          - local_path: ~/projects/www
             destination: /srv/www
+            type: nfs 
+            create: true
+
+          - local_path: ~/projects/mysql
+            destination: /srv/mysql
             type:
             create: true
-          - local_path: ~/Sites/projects_directory2
-            destination: /srv/www2
-            type:
+            owner: 500      # mysql user  not created yet, but will have this id when the box is provisioned
+            group: 500      # mysql group not created yet, but will have this id when the box is provisioned
+
+          - local_path: ~/projects/backup
+            destination: /srv/backup
+            type: nfs
             create: true
         ```
-    -   vagrant_memory: Memory to assign to VM `OPTIONAL - can leave default 2048, recommended 3096`
-    -   vagrant_cpus: CPU Cores to assign to VM `OPTIONAL - can leave default 2`
+    -   vagrant_memory: Memory to assign to VM
+        OPTIONAL - can leave default `2048`, recommended `4096` or more for M2 projects
+    -   vagrant_cpus: CPU Cores to assign to VM
+        OPTIONAL - can leave default `2`
 
-####The following are installed:
+#### The following are installed:
 
 -   Apache2 with mpm\_event
--   Percona 5.6 (Server and Client)
+-   Percona 5.6 (MySQL Server and Client)
 -   Varnish
 -   Redis
 -   PHP-FPM 5.4, 5.5, 5.6 & 7.0 /w Xdebug (via PHPFARM)
@@ -67,20 +85,43 @@ specifically.
 -   mailhog
 
 
-####The following Extra Tools are available:
--   Composer (Added to PATH)
--   N98-Magerun (Added to PATH)
--   modman (Added to PATH)
--   PHPUnit (Added to PATH)
--   redis-setup (Added to PATH)
-    - Add,Remove or List Redis instances
+#### The following Extra Tools are available:
+-   Composer
+-   N98-Magerun and N98-Magerun2
+-   modman
+-   PHPUnit
+-   redis-setup
+    - Add / Remove or List Redis instances
 
         ```Usage: redis-setup add|remove|list -n name [-p port] [-s save]```
--   vhost (Added to PATH)
-    - Add,Remove Apache virtualhost entries
+-   vhost
+    - Add / Remove Apache virtualhost entries
 
-        ```Usage: vhost add|remove -d DocumentRoot -n ServerName -p PhpVersion [-a ServerAlias] [-s CertPath] [-c CertName]```
--   mysql-sync (Added to PATH)
+        ```Usage: vhost add|remove -d DocumentRoot -n ServerName -p PhpVersion [-a ServerAlias] [-s CertPath] [-c CertName] [-f]```
+-   mysql-sync
     - Sync Remote Database to VM Mysql instance
 
         ```Usage: mysql-sync -i remote-ip -p remote-port -u remote-username -d remote-database```
+
+## Change History
+    - 1.0.0 (2016-04-01 to 2017-02-03)
+        - Initial unversioned releases
+    - 1.0.1 (2017-10-16)
+        - Added SSL support for `vhost` function (was on a separate branch)
+    - 1.0.2 (2018-01-16)
+        - Major refactoring to allow php versions, users and groups to be configured much more easily
+        - PHP 7.0.8 replaces PHP 7.0.6 and freeType support added for all PHP versions
+        - Added two new mandatory external shares /srv/backup and /srv/mysql used for backups and live mysql databases
+        - Mysql databases now live on host machine and so can survive a `vagrant destroy` / `vagrant up` cycle
+        - Added `vhelp` command with user help
+        - Added `vstatus` command to show memory and disk use and availablity of key services
+        - Added `xdebug` command for simple enabling / disabling of XDebug in all installed PHP instances added
+        - Added `backypMysql` / `restoreMysql` for easy backup / restore of all mysql databases and users to the external /srv/backup mount
+        - Added `backupWebconfig` / `restoreWebconfig` for easy backup / restore of all newly added vhosts and associated SSL certificates
+        - Added `phpRestart` to restart all installed php FPM services in a single operation
+    - 1.0.3 (2018-01-18)
+        - Added n98-magerun2 and simple alias `n98` that automatically selects correct version of n98 for the instance in question
+    - 1.0.4 (2018-01-22)
+        - Changes to `vhost` command to allow it to support multiple aliases in a single operation
+        - Changes to `vhost` command to add -f (force) flag that can bypass confirmation messages
+        - Provisioner script now identifies and upgrades all existing legacy vhost configurations to support SSL and be backed up by the `backupWebconfig` command
