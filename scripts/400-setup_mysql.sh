@@ -51,6 +51,11 @@ if [ ! -f /etc/init.d/mysql* ]; then
     export MYSQL_PWD=''
 fi
 
+if [[ $(/etc/mysql/my.cnf | grep 'innodb_log_file_size')  == '' ]]; then
+    echo "Patching to allow long blobs in mysql imports"
+    sed -i 's/skip-external-locking/skip-external-locking\ninnodb_log_file_size = 256M\n/' /etc/mysql/my.cnf
+fi
+
 apt-get install -y percona-toolkit 2>&1
 
 
