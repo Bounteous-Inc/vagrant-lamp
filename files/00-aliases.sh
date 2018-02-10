@@ -1,6 +1,6 @@
 function vhelp {
   local _versions=''
-  local _vhost_sites="$(vhost sites)"
+  local _vhost_sites="$(vhost sites | sed 's/$/\\n/g' | tr -d '\n')"
   local config_php
   source /vagrant/config_php.sh
   for i in "${config_php[@]}"; do
