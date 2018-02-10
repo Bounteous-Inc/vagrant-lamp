@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
-# Version 1.0.2
-#
-# Show Usage, Output to STDERR
-#
 function show_header {
     echo -e "\e[32m"
     echo -e "***********************"
-    echo -e "* vhost version 1.0.2 *"
+    echo -e "* vhost version 1.0.3 *"
     echo -e "***********************\e[0m"
 }
 
@@ -18,7 +14,7 @@ function show_usage {
 Create or Remove vHost in Ubuntu Server
 Assumes PHP-FPM with proxy_fcgi and /etc/apache2/sites-available and /etc/apache2/sites-enabled setup are used
 
-Usage: sudo vhost add|remove -d DocumentRoot -n ServerName -p PhpVersion [-a ServerAlias] [-s CertPath] [-c CertName] [-f]
+Usage: sudo vhost add|remove|list|sites -d DocumentRoot -n ServerName [-p PhpVersion] [-a ServerAlias] [-s CertPath] [-c CertName] [-f]
 Options:
   -d DocumentRoot    : DocumentRoot i.e. /var/www/yoursite
   -h Help            : Show this menu.
@@ -27,7 +23,7 @@ Options:
                        You can now add multiple aliases for any given site, e.g.
                        -a www.example.com -a example.ca -a www.example.ca
   -p PHPVersion      : PHP Version:
-                       choose one of these:  [###php_versions###]
+                       Optional - to add PHP-FPM proxy support, choose one of these:  [###php_versions###]
   -s CertPath        : ***SELF SIGNED CERTIFICATE ARE AUTOMATICALLY CREATED FOR EACH VHOST USE THIS TO OVERRIDE***
                        File path to the SSL certificate. Directories only, no file name. OPTIONAL
                        If using an SSL Certificate, also creates a port :443 vhost as well.
@@ -77,32 +73,19 @@ cat <<- _EOF_
 <VirtualHost *:8090>
     ServerAdmin webmaster@localhost
     ServerName  $ServerName
+    DocumentRoot $DocumentRoot###ServerAlias######PhpProxy###
 
-    ###ServerAlias###
-
-    DocumentRoot $DocumentRoot
-
-    # PHP proxy specifications
-    <Proxy fcgi://127.0.0.1:$PhpPort>
-        ProxySet timeout=1800
-    </Proxy>
-
-    ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:$PhpPort$DocumentRoot/\$1
-
+    # Directory Permissions
     <Directory $DocumentRoot>
-        Options -Indexes +FollowSymLinks +MultiViews
+        Options +Indexes +FollowSymLinks +MultiViews
         AllowOverride All
         Require all granted
     </Directory>
 
-    ErrorLog \${APACHE_LOG_DIR}/$ServerName-error.log
-
-    # Possible values include: debug, info, notice, warn, error, crit,
-    # alert, emerg.
-    LogLevel warn
-
+    # Logging
+    ErrorLog  \${APACHE_LOG_DIR}/$ServerName-error.log
     CustomLog \${APACHE_LOG_DIR}/$ServerName-access.log combined
-
+    LogLevel  warn
 
 </VirtualHost>
 _EOF_
@@ -110,37 +93,26 @@ _EOF_
 
 function create_ssl_vhost {
 cat <<- _EOF_
+
 <VirtualHost *:443>
     ServerAdmin webmaster@localhost
     ServerName  $ServerName
+    DocumentRoot $DocumentRoot###ServerAlias######PhpProxy###
 
-    ###ServerAlias###
-
-    # PHP proxy specifications
-    <Proxy fcgi://127.0.0.1:$PhpPort>
-        ProxySet timeout=1800
-    </Proxy>
-
-    ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:$PhpPort$DocumentRoot/\$1
-
-    DocumentRoot $DocumentRoot
-
+    # Directory Permissions
     <Directory $DocumentRoot>
-        Options -Indexes +FollowSymLinks +MultiViews
+        Options +Indexes +FollowSymLinks +MultiViews
         AllowOverride All
         Require all granted
     </Directory>
 
-    ErrorLog \${APACHE_LOG_DIR}/$ServerName-error.log
-
-    # Possible values include: debug, info, notice, warn, error, crit,
-    # alert, emerg.
-    LogLevel warn
-
+    # Logging
+    ErrorLog  \${APACHE_LOG_DIR}/$ServerName-error.log
     CustomLog \${APACHE_LOG_DIR}/$ServerName-access.log combined
+    LogLevel  warn
 
+    # SSL settings
     SSLEngine on
-
     SSLCertificateFile  $CertPath/$CertName.crt
     SSLCertificateKeyFile $KeyPath/$CertName.key
 
@@ -151,8 +123,10 @@ cat <<- _EOF_
     BrowserMatch "MSIE [2-6]" \\
         nokeepalive ssl-unclean-shutdown \\
         downgrade-1.0 force-response-1.0
-    # MSIE 7 and newer should be able to use keepalive
+
+    # MSIE 7-19 should be able to use keepalive  (17-9 is NOT a typo)
     BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+
 </VirtualHost>
 _EOF_
 }
@@ -176,6 +150,8 @@ function confirm () {
 }
 
 function add_vhost {
+    local PhpProxy=''
+
     # If CertName doesn't get set, set it to ServerName
     if [ "$CertName" == "" ]; then
         CertName=$ServerName
@@ -196,7 +172,15 @@ function add_vhost {
         #chown USER:USER $DocumentRoot #POSSIBLE IMPLEMENTATION, new flag -u ?
     fi
 
-    create_vhost | sed "s/###ServerAlias###/${ServerAlias}/g" > /etc/apache2/sites-available/200-${ServerName}.conf
+    if [ "${ServerAlias}" != "" ]; then
+        ServerAlias="\n    ${ServerAlias}"
+    fi
+
+    if [ "${PhpPort}" != "" ]; then
+        PhpProxy="\n\n    # PHP proxy specifications\n    <Proxy fcgi:\/\/127.0.0.1:$PhpPort>\n        ProxySet timeout=1800\n    <\/Proxy>\n\n    ProxyPassMatch ^\/(.*\\\.php(\/.*)?)$ fcgi:\/\/127.0.0.1:$PhpPort${DocumentRoot}\/\$1"
+    fi
+
+    create_vhost | sed "s|###ServerAlias###|${ServerAlias}|g" | sed "s|###PhpProxy###|${PhpProxy}|g" > /etc/apache2/sites-available/200-${ServerName}.conf
 
     # Make directory to place SSL Certificate if it doesn't exists
     if [[ ! -d $KeyPath ]]; then
@@ -219,7 +203,7 @@ function add_vhost {
         fi
     fi
 
-    create_ssl_vhost | sed "s/###ServerAlias###/${ServerAlias}/g" >> /etc/apache2/sites-available/200-${ServerName}.conf
+    create_ssl_vhost | sed "s|###ServerAlias###|${ServerAlias}|g" | sed "s|###PhpProxy###|${PhpProxy}|g" >> /etc/apache2/sites-available/200-${ServerName}.conf
 
     # Enable Site
     cd /etc/apache2/sites-available/ && a2ensite 200-${ServerName}.conf
@@ -255,8 +239,7 @@ function remove_vhost {
 }
 
 function parse_php_version {
-    local config_php
-    local i
+    local config_php i
     source /vagrant/config_php.sh
     for i in "${config_php[@]}"; do
         local arr=(${i// / })
@@ -278,32 +261,93 @@ function show_error {
     echo -e "\e[31m${1}\e[0m"
 }
 
+function vhost_list {
+    local a arr config configs config_php d i n p port phpn phpp phpv out
+    configs="$(ls -1 /etc/apache2/sites-enabled/200-*.conf 2>/dev/null)"
+    source /vagrant/config_php.sh
+
+    out=''
+    for config in ${configs[@]} ; do
+        filename=${config}
+        file=$(cat $filename)
+        a=$(echo "$file" | head -n20 | grep 'ServerAlias' | xargs | sed "s/ServerAlias /-a*/g")
+        d=$(echo "$file" | grep 'DocumentRoot' | head -n1 | xargs | cut -d' ' -f2)
+        n=$(echo "$file" | grep 'ServerName ' | head -n1 | xargs | cut -d' ' -f2)
+        port=$(echo "$file" | grep '<Proxy fcgi://127.0.0.1:' | xargs | head -n1 | cut -d':' -f3 | cut -d'>' -f1)
+        p=''
+        for i in "${config_php[@]}"; do
+            arr=(${i// / })
+            phpv=${arr[0]}
+            phpn=${arr[1]}
+            phpp=${arr[2]}
+            if [ "${port}" = "${phpp}" ]; then
+                p=${phpn}
+            fi
+        done;
+
+        if [ "$a" != "" ] ; then a=" $a"    ; fi
+        if [ "$d" != "" ] ; then d=" -d*$d" ; fi
+        if [ "$n" != "" ] ; then n=" -n*$n" ; fi   
+        if [ "$p" != "" ] ; then p=" -p*$p" ; fi
+
+        out="${out}****sudo*vhost*add*${n}${p}${d}${a} -f;
+"
+    done
+    echo "${out}" | column -t | sed "s/*/ /g"
+}
+
+function vhost_sites {
+    local arr sites vhost vhosts
+    vhosts=$(vhost_list)
+
+    if [ "${vhosts}" != "" ]; then
+        echo "${vhosts}" | while read line ; do
+            arr=(${line// / })
+            echo "    * https://${arr[4]}";
+        done
+    fi
+}
+
 # Set Defaults
 CertPath=""
 KeyPath=""
 ServerAlias=""
+PhpVersion=""
 force="n"
+Task=''
 
 # Transform long options to short ones
 for arg in "$@"; do
   case "$arg" in
     "add")
         shift
-        set -- "$@" "-A"
+        # set -- "$@" "-A"
+        Task='add'
         ;;
     "remove")
         shift
-        set -- "$@" "-R"
+        # set -- "$@" "-R"
+        Task='remove'
+        ;;
+    "list")
+        shift
+        # set -- "$@" "-L"
+        Task='list'
+        ;;
+    "sites")
+        shift
+        # set -- "$@" "-S"
+        Task='sites'
         ;;
      *)
         set -- "$@" "$arg"
   esac
 done
 
-#Parse flags
+# Parse flags
 ServerAlias=""
 Force='n'
-while getopts "d:s:k:a:p:n:c:h:ARf" OPTION; do
+while getopts "d:s:k:a:p:n:c:h:ARLSf" OPTION; do
     case $OPTION in
         h)
             show_usage
@@ -337,57 +381,81 @@ while getopts "d:s:k:a:p:n:c:h:ARf" OPTION; do
         R)
             Task="remove"
             ;;
+        L)
+            Task="list"
+            ;;
+        S)
+            Task="sites"
+            ;;
         f)
             Force="y"
-            ;;
-        *)
-            show_usage
             ;;
     esac
 done
 
-show_header
-if [ "$(id -u)" != "0" ]; then
-    if [ "$Task" == 'add' ] || [ "$Task" == 'remove' ]; then
-        show_error "Must be run with 'sudo' or as root.  Aborting."
-        exit 1
-    fi
-    show_usage
-    exit 1
-elif [ "$Task" = "add" ] ; then
-    if [ "$ServerName" = "" ] ; then
-        show_error "Missing Server Name.  Aborting."
-        exit 1
-    elif [ "$DocumentRoot" == "" ]; then
-        show_error "DocumentRoot must be set.  Aborting."
-        exit 1
-    elif [ "$CertPath" != "" ] && [ "$KeyPath" == "" ]; then
-        show_error "When supplying CertPath, KeyPath must also be supplied.  Aborting."
-        exit 1
-    elif [ "$CertPath" == "" ] && [ "$KeyPath" != "" ]; then
-        show_error "When supplying KeyPath, CertPath must also be supplied.  Aborting."
-        exit 1
-    elif [ -f "/etc/apache2/sites-available/$ServerName.conf" ] || [ -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
-        parse_php_version
-        if confirm "vHost $ServerName already exists. Remove and Recreate it? [y/N]" ; then
-            remove_vhost
-        else
+
+case ${Task} in
+    list)
+        vhost_list
+        ;;
+    sites)
+        vhost_sites
+        ;;
+    add)
+        if [ "$(id -u)" != "0" ] ; then
+            show_header
+            show_error "Command \e[1mvhost add \e[0;31mmust be run with 'sudo' or as root.  Aborting."
             exit 1
         fi
-    fi
-    parse_php_version
-    add_vhost
-elif [ "$Task" = "remove" ] ; then
-    if [ "$ServerName" = "" ] ; then
-        show_error "Missing Server Name.  Aborting."
+        if [ "${PhpVersion}" != "" ]; then
+            parse_php_version
+        fi
+        if [ "$ServerName" = "" ] ; then
+            show_header
+            show_error "Missing Server Name.  Aborting."
+            exit 1
+        elif [ "$DocumentRoot" == "" ]; then
+            show_header
+            show_error "DocumentRoot must be set.  Aborting."
+            exit 1
+        elif [ "$CertPath" != "" ] && [ "$KeyPath" == "" ]; then
+            show_header
+            show_error "When supplying CertPath, KeyPath must also be supplied.  Aborting."
+            exit 1
+        elif [ "$CertPath" == "" ] && [ "$KeyPath" != "" ]; then
+            show_header
+            show_error "When supplying KeyPath, CertPath must also be supplied.  Aborting."
+            exit 1
+        elif [ -f "/etc/apache2/sites-available/$ServerName.conf" ] || [ -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
+            if confirm "vHost $ServerName already exists. Remove and Recreate it? [y/N]" ; then
+                remove_vhost
+            else
+                exit 1
+            fi
+        fi
+        add_vhost
+        ;;
+    remove)
+        if [ "$(id -u)" != "0" ] ; then
+            show_header
+            show_error "Command \e[1mvhost remove \e[0;31mmust be run with 'sudo' or as root.  Aborting."
+            exit 1
+        fi
+        if [ "$ServerName" = "" ] ; then
+            show_header
+            show_error "Missing Server Name.  Aborting."
+            exit 1
+        fi
+        if [ ! -f "/etc/apache2/sites-available/$ServerName.conf" ] && [ ! -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
+            show_error "vHost $ServerName not present"
+            exit 1
+        fi
+        confirm "Remove vHost $ServerName? [y/N]" && remove_vhost
+        ;;
+    *)
+        show_header
+        show_usage
         exit 1
-    fi
-    if [ ! -f "/etc/apache2/sites-available/$ServerName.conf" ] && [ ! -f "/etc/apache2/sites-available/200-$ServerName.conf" ]; then
-        show_error "vHost $ServerName not present"
-        exit 1
-    fi
-    confirm "Remove vHost $ServerName? [y/N]" && remove_vhost
-else
-    show_usage
-    exit 1
-fi
+        ;;
+esac
+

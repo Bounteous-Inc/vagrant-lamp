@@ -41,6 +41,9 @@ The following functions and aliases are available:
                       This is shared on your host machine so will survive a \e[33mvagrant destroy\e[0;32m
   restoreWebconfig  - Restores all of your VHost configuration settings and SSL certificates from /srv/backup
                       This is shared on your host machine so will survive a \e[33mvagrant destroy\e[0;32m
-  www               - Changes to the /srv/www directory
+  vhost             - Use this to add, remove or list vhosts, or to see a simple list of sites available
+  www               - Switches you to the /srv/www directory
 
+  The following websites are set up in this environment - use \e[33mvhost sites\e[0;32m to see this list again
+###vhost_sites###\e[0;32m
 \e[0m

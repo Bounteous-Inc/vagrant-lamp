@@ -1,5 +1,6 @@
 function vhelp {
   local _versions=''
+  local _vhost_sites="$(vhost sites)"
   local config_php
   source /vagrant/config_php.sh
   for i in "${config_php[@]}"; do
@@ -8,10 +9,11 @@ function vhelp {
     phpn=${arr[1]}
     phpv_x=${phpv}'     '
     phpn_x=${phpn}'     '
-    line="  * PHP ${phpv_x:0:6}      - alias php${phpn}"
+    line="    * PHP ${phpv_x:0:6}      - alias php${phpn}"
     _versions="${_versions}${line}\n"
   done;
-  text=$(sed "s/###php_versions###/${_versions}/g" /vagrant/files/welcome.txt);
+
+  text=$(sed "s|###php_versions###|${_versions}|g" /vagrant/files/welcome.txt | sed "s|###vhost_sites###|${_vhost_sites}|g");
   echo -e "$text"
 }
 
