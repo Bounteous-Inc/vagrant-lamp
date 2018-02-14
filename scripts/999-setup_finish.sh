@@ -6,5 +6,5 @@ echo "******************************"
 # Restart Services
 service apache2 restart
 service varnish restart
-source /etc/profile.d/00-aliases.sh
+source /etc/profile.d/*-aliases.sh
 phpRestart

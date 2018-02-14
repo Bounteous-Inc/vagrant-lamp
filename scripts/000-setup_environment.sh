@@ -33,6 +33,9 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
 done </vagrant/files/hosts.txt
 
 
+# Removes old non-modular alias if present
+rm -f /etc/profile.d/00-aliases.sh
+
 # Copy bash aliases for all users
 cp /vagrant/files/profile.d/* /etc/profile.d/
 
