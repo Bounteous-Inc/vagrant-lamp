@@ -33,13 +33,12 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
 done </vagrant/files/hosts.txt
 
 
-# Copy bash aliases and welcome message for all users
-cp /vagrant/files/00-aliases.sh /etc/profile.d/
-cp /vagrant/files/99-welcome.sh /etc/profile.d/
+# Copy bash aliases for all users
+cp /vagrant/files/profile.d/* /etc/profile.d/
 
 # Next line needed so that root will have access to these aliases
-if [ ! grep -q "source /etc/profile.d/00-aliases.sh" /root/.bash_aliases ] ; then
-  echo "source /etc/profile.d/00-aliases.sh" >> /root/.bash_aliases
+if [ ! grep -q "source /etc/profile.d/*aliases.sh" /root/.bash_aliases ] ; then
+  echo "source /etc/profile.d/*aliases.sh" >> /root/.bash_aliases
 fi
 
 #Setup PHP compile pre-requisites
