@@ -41,8 +41,12 @@ if [ ! -f /etc/init.d/mysql* ]; then
     sed -i "s/bind-address.*/bind-address    = 0.0.0.0/"           /etc/mysql/my.cnf
     sed -i "s/max_allowed_packet.*/max_allowed_packet      = 64M/" /etc/mysql/my.cnf
     sed -i "s/datadir.*/datadir         = \/srv\/mysql\/data/"     /etc/mysql/my.cnf
-    echo "Copying mysql databases from /var/lib/mysql/ to /srv/mysql/data ..."
-    cp -r /var/lib/mysql/* /srv/mysql/data
+    if [ ! -d /srv/mysql/data/mysql ]; then
+        echo "Copying mysql databases from /var/lib/mysql/ to /srv/mysql/data ..."
+        cp -r /var/lib/mysql/* /srv/mysql/data
+    else
+        echo "Not moving mysql databases from /var/lib/mysql/ to /srv/mysql/data since data is already present there"
+    fi
 
     service mysql start
 

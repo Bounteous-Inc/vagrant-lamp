@@ -40,14 +40,14 @@ rm -f /etc/profile.d/00-aliases.sh
 cp /vagrant/files/profile.d/* /etc/profile.d/
 
 # Next line needed so that root will have access to these aliases
-if [ ! -f /root/.bash_aliases ] || ! grep -q "for f in \/etc\/profile.d\/\*-aliases.sh; do source \$f; done" /root/.bash_aliases ; then
+if [ ! -f /root/.bash_aliases ] || [ $(grep -c "for f in /etc/profile.d/\*aliases.sh; do source \$f; done" /root/.bash_aliases) -eq 0 ] ; then
     echo 'for f in /etc/profile.d/*-aliases.sh; do source $f; done' >> /root/.bash_aliases
 fi
 
 #Setup PHP compile pre-requisites
 apt-get install -y  build-essential libbz2-dev libmysqlclient-dev libxpm-dev libmcrypt-dev \
     libcurl4-gnutls-dev libxml2-dev libjpeg-dev libpng12-dev libssl-dev pkg-config libreadline-dev \
-    curl autoconf libicu-dev libxslt-dev freetype* 2>&1
+    curl autoconf libicu-dev libxslt-dev libfreetype6-dev 2>&1
 
 # Workaround to allow custom scripts added to path with sudo
 if ! grep -q "^#Defaults[[:blank:]]*secure_path" /etc/sudoers ; then

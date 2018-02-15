@@ -41,8 +41,8 @@ function setup_phpfarm() {
     cd /opt
     if [ ! -d /opt/phpfarm ]; then
         git clone https://github.com/DemacMedia/phpfarm.git phpfarm
-
-        # Patch phpfarm options files until I can get a PR put on there to fix these at source:
+    else
+        # Patch old phpfarm options:
         if [[ $(/opt/phpfarm/custom/options-5.4.sh | grep 'freetype')  == '' ]]; then
             sed -i "s/--with-png-dir/--with-png-dir \\\\\n--with-freetype-dir=\/usr\/include\/freetype2 \\\\\n--enable-gd-native-ttf/" /opt/phpfarm/custom/options-5.4.sh
         fi
