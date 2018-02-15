@@ -40,8 +40,8 @@ rm -f /etc/profile.d/00-aliases.sh
 cp /vagrant/files/profile.d/* /etc/profile.d/
 
 # Next line needed so that root will have access to these aliases
-if [ ! grep -q "source /etc/profile.d/*aliases.sh" /root/.bash_aliases ] ; then
-  echo "source /etc/profile.d/*aliases.sh" >> /root/.bash_aliases
+if [ ! -f /root/.bash_aliases ] || ! grep -q "for f in \/etc\/profile.d\/\*-aliases.sh; do source \$f; done" /root/.bash_aliases ; then
+    echo 'for f in /etc/profile.d/*-aliases.sh; do source $f; done' >> /root/.bash_aliases
 fi
 
 #Setup PHP compile pre-requisites
