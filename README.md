@@ -104,4 +104,4 @@ specifically.
         ```Usage: mysql-sync -i remote-ip -p remote-port -u remote-username -d remote-database```
 
 ## Changelog:
-    [See CHANGELOG.md](CHANGELOG.md)
+See [CHANGELOG.md](CHANGELOG.md) for the full change history
