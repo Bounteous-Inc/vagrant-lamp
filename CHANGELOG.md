@@ -69,6 +69,7 @@
 
 ## [1.0.1](https://github.com/demacmedia/vagrant-lamp/tree/1.0.1) (2017-10-17)
 [Full Changelog](https://github.com/demacmedia/vagrant-lamp/compare/1.0.0...1.0.1)
+
     - Added SSL support for `vhost` function (was on a separate branch)
 
 ## [1.0.0](https://github.com/demacmedia/vagrant-lamp/tree/1.0.0) (2016-04-01 to 2017-02-03)
