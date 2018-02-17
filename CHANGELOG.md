@@ -6,19 +6,19 @@
     - Added monitoring of varnish service to vstatus
     - Modified README.md to remove internal changelog section
     - Added CHANGELOG.md - partially automated with github_changelog_generator
-        -- Install that product with `sudo gem install github_changelog_generator`
-        -- Run like this: github_changelog_generator -u demacmedia -p vagrant-lamp -t [add your github API here]
-        -- A Github Personal Access token can be generated via Settings / Developer settings / Personal Access Tokens
+        - Install that product with `sudo gem install github_changelog_generator`
+        - Run like this: github_changelog_generator -u demacmedia -p vagrant-lamp -t [add your github API here]
+        - A Github Personal Access token can be generated via Settings / Developer settings / Personal Access Tokens
            The token should allow the follwoing operations: `public_repo, repo:status, repo_deployment`
 
 ## [1.0.11](https://github.com/demacmedia/vagrant-lamp/tree/1.0.11) (2018-02-15)
 [Full Changelog](https://github.com/demacmedia/vagrant-lamp/compare/1.0.10...1.0.11)
 
     - Refactor/Updates
-        -- 000-setup_environment.sh updated grep command to use a count comparison when checking if aliases exist in .bash_aliases
-        -- 000-setup_environment.sh replaced 'freetype*' with specific 'libfreetype6-dev' in php pre-requisites
-        -- 400-setup_mysql.sh added if condition to avoid overwrite existing mysql data with that of a fresh install
-        -- 500-setup_php.sh moved sed replace commands into seperate condition to handle old php-farm pulls
+        - 000-setup_environment.sh updated grep command to use a count comparison when checking if aliases exist in .bash_aliases
+        - 000-setup_environment.sh replaced 'freetype*' with specific 'libfreetype6-dev' in php pre-requisites
+        - 400-setup_mysql.sh added if condition to avoid overwrite existing mysql data with that of a fresh install
+        - 500-setup_php.sh moved sed replace commands into seperate condition to handle old php-farm pulls
 
 ## [1.0.10](https://github.com/demacmedia/vagrant-lamp/tree/1.0.10) (2018-02-15)
 [Full Changelog](https://github.com/demacmedia/vagrant-lamp/compare/1.0.9...1.0.10)
