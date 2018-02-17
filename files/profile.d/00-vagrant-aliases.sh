@@ -32,6 +32,7 @@ function vstatus {
     echo -e "  Apache2 Status:  $(if [[ $(sudo service apache2      status | grep 'not running') == '' ]]; then echo '\033[1;32mOK\033[0;32m'; else echo '\033[1;31mStopped\033[0;32m'; fi)"
     echo -e "  Mysql Status:    $(if [[ $(sudo service mysql        status | grep 'is stopped')  == '' ]]; then echo '\033[1;32mOK\033[0;32m'; else echo '\033[1;31mStopped\033[0;32m'; fi)"
     echo -e "  Redis Status:    $(if [[ $(sudo service redis-server status | grep 'not running') == '' ]]; then echo '\033[1;32mOK\033[0;32m'; else echo '\033[1;31mStopped\033[0;32m'; fi)"
+    echo -e "  Varnish Status:  $(if [[ $(sudo pgrep varnishd) != '' ]]; then echo '\033[1;32mOK\033[0;32m'; else echo '\033[1;31mStopped\033[0;32m'; fi)"
     echo -e "\033[0m"
 }
 

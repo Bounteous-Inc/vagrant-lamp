@@ -1,6 +1,6 @@
 # Demac Flavoured vagrant-lamp
 
-Jump to [Goal](#goal) | [Requirements](#requirements) | [Setup](#setup) | [Configuration](#configuration) | [Change History](#change-history)
+Jump to [Goal](#goal) | [Requirements](#requirements) | [Setup](#setup) | [Configuration](#configuration) | [Changelog](#changelog)
 
 ### Goal
 The goal of this project is to create an easy to use, reliable development environment.
@@ -103,25 +103,5 @@ specifically.
 
         ```Usage: mysql-sync -i remote-ip -p remote-port -u remote-username -d remote-database```
 
-## Change History
-    - 1.0.0 (2016-04-01 to 2017-02-03)
-        - Initial unversioned releases
-    - 1.0.1 (2017-10-16)
-        - Added SSL support for `vhost` function (was on a separate branch)
-    - 1.0.2 (2018-01-16)
-        - Major refactoring to allow php versions, users and groups to be configured much more easily
-        - PHP 7.0.8 replaces PHP 7.0.6 and freeType support added for all PHP versions
-        - Added two new mandatory external shares /srv/backup and /srv/mysql used for backups and live mysql databases
-        - Mysql databases now live on host machine and so can survive a `vagrant destroy` / `vagrant up` cycle
-        - Added `vhelp` command with user help
-        - Added `vstatus` command to show memory and disk use and availablity of key services
-        - Added `xdebug` command for simple enabling / disabling of XDebug in all installed PHP instances added
-        - Added `backypMysql` / `restoreMysql` for easy backup / restore of all mysql databases and users to the external /srv/backup mount
-        - Added `backupWebconfig` / `restoreWebconfig` for easy backup / restore of all newly added vhosts and associated SSL certificates
-        - Added `phpRestart` to restart all installed php FPM services in a single operation
-    - 1.0.3 (2018-01-18)
-        - Added n98-magerun2 and simple alias `n98` that automatically selects correct version of n98 for the instance in question
-    - 1.0.4 (2018-01-22)
-        - Changes to `vhost` command to allow it to support multiple aliases in a single operation
-        - Changes to `vhost` command to add -f (force) flag that can bypass confirmation messages
-        - Provisioner script now identifies and upgrades all existing legacy vhost configurations to support SSL and be backed up by the `backupWebconfig` command
+## Changelog:
+    [See CHANGELOG.md](CHANGELOG.md)
