@@ -32,3 +32,88 @@ vagrant_synced_folders:
 # Memory and CPU to use for this VM.
 vagrant_memory: 4096
 vagrant_cpus: 2
+
+# Optional Software to install
+optional_software:
+  elasticsearch: false
+  solr: false
+  rabbitmq: false
+
+# Configure PHP
+config_php:
+  - version: 5.4.45
+    shortname: 5.4
+    port: 9004
+    build: false
+    enabled: true
+
+  - version: 5.5.34
+    shortname: 5.5
+    port: 9005
+    build: false
+    enabled: true
+
+  - version: 5.6.20
+    shortname: 5.6
+    port: 9006
+    build: false
+    enabled: true
+
+  - version: 7.0.8
+    shortname: 7
+    port: 9007
+    build: false
+    enabled: true
+
+  - version: 7.1.12
+    shortname: 7.1
+    port: 9008
+    build: false
+    enabled: true
+
+# Configure Users
+#  For no home    use '-'
+#  For no shell   use '-'
+#  For no comment use '-'
+config_users:
+  - uid: 500
+    gid: 500
+    name: mysql
+    home: '-'
+    shell: /bin/false
+    comment: 'MySql Server'
+
+  - uid: 501
+    gid: 501
+    name: redis
+    home: /var/lib/redis
+    shell: /bin/false
+    comment: 'Redis Server'
+
+  - uid: 502
+    gid: 502
+    name: varnish
+    home: /home/varnish
+    shell: /bin/false
+    comment: 'Varnish Server'
+
+  - uid: 503
+    gid: 503
+    name: varnishlog
+    home: /home/varnishlog
+    shell: /bin/false
+    comment: 'VarnishLog'
+
+# Configure Groups
+config_groups:
+  - gid: 500
+    name: mysql
+
+  - gid: 501
+    name: redis
+
+  - gid: 502
+    name: varnish
+
+  - gid: 503
+    name: varnishlog

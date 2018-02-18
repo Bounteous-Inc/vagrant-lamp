@@ -10,7 +10,7 @@ set -ex
 if [ -f /etc/init.d/mysql* ]; then
     service mysql stop
 
-    sed -i "s/datadir.*/datadir         = \/srv\/mysql\/data/"     /etc/mysql/my.cnf
+    sed -i "s/datadir.*/datadir = \/srv\/mysql\/data/" /etc/mysql/my.cnf
     if [ ! -d /srv/mysql/data/mysql ]; then
         echo "Copying mysql databases from /var/lib/mysql/ to /srv/mysql/data ..."
         cp -r /var/lib/mysql/* /srv/mysql/data
@@ -27,7 +27,6 @@ if [ -f /etc/init.d/mysql* ]; then
     export MYSQL_PWD=''
 fi
 
-
 if [ ! -f /etc/init.d/mysql* ]; then
     wget https://repo.percona.com/apt/percona-release_0.1-4.$(lsb_release -sc)_all.deb
     dpkg -i percona-release_0.1-4.$(lsb_release -sc)_all.deb
@@ -38,9 +37,8 @@ if [ ! -f /etc/init.d/mysql* ]; then
     apt-get install -y percona-server-server-5.6 percona-server-client-5.6 2>&1
     service mysql stop
 
-    sed -i "s/bind-address.*/bind-address    = 0.0.0.0/"           /etc/mysql/my.cnf
-    sed -i "s/max_allowed_packet.*/max_allowed_packet      = 64M/" /etc/mysql/my.cnf
-    sed -i "s/datadir.*/datadir         = \/srv\/mysql\/data/"     /etc/mysql/my.cnf
+    printf "[mysqld]\nbind-address = 0.0.0.0\nmax_allowed_packet = 64M\ndatadir = /srv/mysql/data\ninnodb_log_file_size = 256M\n" >> /etc/mysql/my.cnf
+
     if [ ! -d /srv/mysql/data/mysql ]; then
         echo "Copying mysql databases from /var/lib/mysql/ to /srv/mysql/data ..."
         cp -r /var/lib/mysql/* /srv/mysql/data
@@ -55,13 +53,7 @@ if [ ! -f /etc/init.d/mysql* ]; then
     export MYSQL_PWD=''
 fi
 
-if [[ $(/etc/mysql/my.cnf | grep 'innodb_log_file_size')  == '' ]]; then
-    echo "Patching to allow long blobs in mysql imports"
-    sed -i 's/skip-external-locking/skip-external-locking\ninnodb_log_file_size = 256M\n/' /etc/mysql/my.cnf
-fi
-
 apt-get install -y percona-toolkit 2>&1
-
 
 # Setup mysql-sync script
 yes | cp -rf /vagrant/files/mysql-sync.sh /usr/local/bin/mysql-sync

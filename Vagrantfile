@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 mounts_required = Array.[]('/srv/www', '/srv/mysql', '/srv/backup')
+config_required = Array.[]('config_php', 'config_users', 'config_groups')
 
 # Use config.yml for basic VM configuration.
 require 'yaml'
@@ -29,6 +30,20 @@ mounts_required.each do |required_folder|
       'mapping to ' + mounts_required.to_s + "\n" +
       "Please see example.config.yml for details on how to set this.\n" +
       "\n"
+    exit
+  end
+end
+
+config_required.each do |required_config|
+  if !vconfig[required_config]
+    puts "\n" +
+    '**********************' + "\n" +
+    '* Demac Vagrant Lamp *' + "\n" +
+    '**********************' + "\n" +
+    'Your config.yml file must contain a ' +
+     required_config + ' element.' + "\n" +
+    "Please see example.config.yml for details on how to set this.\n" +
+    "\n"
     exit
   end
 end
@@ -63,7 +78,7 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "ubuntu/xenial64"
 
   # Networking configuration.
   config.vm.hostname = vconfig['vagrant_hostname']
@@ -121,12 +136,38 @@ Vagrant.configure(2) do |config|
     vb.customize ['modifyvm', :id, '--ioapic', 'on']
   end
 
+  # Create config_php.sh
+  config.vm.provision "shell", inline: "rm -f /vagrant/config_php.sh"
+  vconfig['config_php'].each do |config_php|
+    if config_php['enabled']
+      config.vm.provision :shell, :path => "scripts/build/config_php.sh", :args => ["#{config_php['version']}", "#{config_php['shortname']}", config_php['port'], "#{config_php['build']}"]
+    end
+  end
+
+  # Create config_users.sh
+  config.vm.provision "shell", inline: "rm -f /vagrant/config_users.sh"
+  vconfig['config_users'].each do |config_users|
+      config.vm.provision :shell, :path => "scripts/build/config_users.sh", :args => [config_users['uid'], config_users['gid'], config_users['name'], config_users['home'], config_users['shell'], config_users['comment']]
+  end
+
+  # Create config_groups.sh
+  config.vm.provision "shell", inline: "rm -f /vagrant/config_groups.sh"
+  vconfig['config_groups'].each do |config_groups|
+      config.vm.provision :shell, :path => "scripts/build/config_groups.sh", :args => [config_groups['gid'], config_groups['name']]
+  end
+
   # Run all setup scripts in numbered order:
-  dir = File.dirname(File.expand_path(__FILE__))
   @files = Dir.glob("#{dir}/scripts/*.sh").sort.each do |setup_script|
     provision_name = setup_script.split('/')[-1].split('-')[1].split('.')[0]
     # puts "#{provision_name} #{setup_script}"
     config.vm.provision provision_name, type: "shell", path: setup_script
+  end
+
+  # Run optional software
+  vconfig['optional_software'].each do |optional_software, should_install|
+    if should_install
+      config.vm.provision optional_software, type: "shell", path: "#{dir}/scripts/optional/setup_#{optional_software}.sh"
+    end
   end
 
   config.vm.define vconfig['vagrant_machine_name']

@@ -72,11 +72,11 @@ specifically.
 
 #### The following are installed:
 
--   Apache2 with mpm\_event
+-   Apache2 2.4 with mpm\_event
 -   Percona 5.6 (MySQL Server and Client)
--   Varnish
+-   Varnish 4
 -   Redis
--   PHP-FPM 5.4, 5.5, 5.6 & 7.0 /w Xdebug (via PHPFARM)
+-   PHP-FPM 5.4, 5.5, 5.6, 7.0 & 7.1 /w Xdebug (via PHPFARM)
 -   HTOP
 -   dos2unix
 -   smem

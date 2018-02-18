@@ -23,3 +23,9 @@ DAEMON_OPTS="-a :80 \\
              -S /etc/varnish/secret \\
              -s malloc,256m"
 EOF
+
+if [ -f /lib/systemd/system/varnish.service ] && [ $(grep -c "a :6081" /lib/systemd/system/varnish.service) -eq 1 ] ; then
+    sed -i "s/a :6081/a :80/" /lib/systemd/system/varnish.service
+    systemctl daemon-reload
+    service varnish restart
+fi

@@ -177,7 +177,7 @@ function add_vhost {
     fi
 
     if [ "${PhpPort}" != "" ]; then
-        PhpProxy="\n\n    # PHP proxy specifications\n    <Proxy fcgi:\/\/127.0.0.1:$PhpPort>\n        ProxySet timeout=1800\n    <\/Proxy>\n\n    ProxyPassMatch ^\/(.*\\\.php(\/.*)?)$ fcgi:\/\/127.0.0.1:$PhpPort${DocumentRoot}\/\$1"
+        PhpProxy="\n\n    # PHP proxy specifications\n    <Proxy fcgi:\/\/127.0.0.1:$PhpPort>\n        ProxySet timeout=1800\n    <\/Proxy>\n\n    <FilesMatch \\\.php\\$>\n        SetHandler \"proxy:fcgi:\/\/127.0.0.1:$PhpPort\"\n    <\/FilesMatch>"
     fi
 
     create_vhost | sed "s|###ServerAlias###|${ServerAlias}|g" | sed "s|###PhpProxy###|${PhpProxy}|g" > /etc/apache2/sites-available/200-${ServerName}.conf

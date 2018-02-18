@@ -118,12 +118,18 @@ function setup_php() {
         phpv=${arr[0]}
         phpn=${arr[1]}
         phpp=${arr[2]}
+        phpb=${arr[3]}
 
         if [ ! -f /opt/phpfarm/inst/php-${phpv}/bin/php ]; then
-            cd /opt/phpfarm/src
-            ./main.sh ${phpv}
-            setup_xdebug ${phpv}
-            cp /opt/phpfarm/inst/php-${phpv}/etc/php.ini /opt/phpfarm/inst/php-${phpv}/lib/php.ini
+            if [ ${phpb} == 'true' ] || [ ! -f /vagrant/files/php_builds/php-${phpv}.tar.gz ] ; then
+                cd /opt/phpfarm/src
+                ./main.sh ${phpv}
+                setup_xdebug ${phpv}
+                cp /opt/phpfarm/inst/php-${phpv}/etc/php.ini /opt/phpfarm/inst/php-${phpv}/lib/php.ini
+             else
+                cd /opt/phpfarm/inst
+                tar -zxf /vagrant/files/php_builds/php-${phpv}.tar.gz
+             fi
         fi
         if [ ${phpv:0:1} == 5 ]; then
             php_config_suffix_escaped="\/etc\/php-fpm.conf"
