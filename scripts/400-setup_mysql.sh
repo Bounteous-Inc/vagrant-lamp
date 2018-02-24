@@ -17,6 +17,10 @@ if [ -f /etc/init.d/mysql* ]; then
     else
         echo "Not moving mysql databases from /var/lib/mysql/ to /srv/mysql/data since data is already present there"
     fi
+
+    # Make sure mysql belongs to the vagrant group for read/write permissions on mound
+    usermod -a -G vagrant mysql
+
     service mysql start
 
     # Get password for debian-sys-maintainer in case we have existing databases which need to have this set to a new value
@@ -28,7 +32,7 @@ if [ -f /etc/init.d/mysql* ]; then
 fi
 
 if [ ! -f /etc/init.d/mysql* ]; then
-    wget https://repo.percona.com/apt/percona-release_0.1-4.$(lsb_release -sc)_all.deb
+    wget --progress=bar:force https://repo.percona.com/apt/percona-release_0.1-4.$(lsb_release -sc)_all.deb
     dpkg -i percona-release_0.1-4.$(lsb_release -sc)_all.deb
     apt-get update
     echo "percona-server-server-5.6 percona-server-server/root_password password root"       | sudo debconf-set-selections
@@ -45,6 +49,9 @@ if [ ! -f /etc/init.d/mysql* ]; then
     else
         echo "Not moving mysql databases from /var/lib/mysql/ to /srv/mysql/data since data is already present there"
     fi
+
+    # Make sure mysql belongs to the vagrant group for read/write permissions on mound
+    usermod -a -G vagrant mysql
 
     service mysql start
 

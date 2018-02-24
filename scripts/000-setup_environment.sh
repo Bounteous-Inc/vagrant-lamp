@@ -13,6 +13,17 @@ mkdir -p /srv/backup/webconfig
 # Create folder for mysql data
 mkdir -p /srv/mysql/data
 
+# Create folder for php builds
+mkdir -p /vagrant/files/php_builds
+
+# Check Box Version
+if [ "$(lsb_release -sr)" != "16.04" ] ; then
+    set +x
+    text=$(sed "s|###version###|$(lsb_release -sr)|g" /vagrant/files/upgrade.txt);
+    echo -e "$text"
+    exit 1
+fi
+
 apt-get update
 
 # Install git, tig, htop, smem, strace, lynx and dos2unix
@@ -21,9 +32,6 @@ apt-get install -y git tig htop smem strace lynx dos2unix 2>&1
 # Correct non Unix line endings
 find /vagrant/files -type f -exec dos2unix {} \;
 dos2unix /vagrant/config_php.sh
-dos2unix /vagrant/config_groups.sh
-dos2unix /vagrant/config_users.sh
-
 
 # Setup Hosts file
 while IFS='' read -r line || [[ -n "$line" ]]; do

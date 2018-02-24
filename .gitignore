@@ -5,6 +5,3 @@
 /backup
 /mysql
 /config.yml
-/config_users.sh
-/config_groups.sh
-/config_php.sh

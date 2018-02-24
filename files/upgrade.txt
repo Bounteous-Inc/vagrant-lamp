@@ -1,0 +1,23 @@
+\e[31m
+*******************************************
+*                  ERROR                  *
+*******************************************
+*                                         *
+*         Ubuntu version mismatch         *
+*                                         *
+*******************************************\e[0m
+\e[8m \e[0m
+This release of the Demac Vagrant LAMP is intended to be used with \e[32mUbuntu 16.04\e[0m, however \e[31mUbuntu ###version###\e[0m was
+detected. Provisioning has been halted to avoid compatibility issues.
+\e[8m \e[0m
+If you are upgrading from an older version of the Vagrant LAMP, please create a backup of your vhost entries and mysql
+databases. It is recommended to use the built in \e[1m`backupWebconfig`\e[0m and \e[1m`backupMysql`\e[0m commands.
+\e[8m \e[0m
+After creating the needed backups, halt the current Vagrant instance \e[1m`vagrant halt`\e[0m, remove the old Vagrant image
+\e[1m`vagrant destroy`\e[0m then restart the Vagrant instance \e[1m`vagrant up`\e[0m and it will rebuild using the updated version of Ubuntu.
+\e[8m \e[0m
+Once completed if you created the backups using the built in commands you can restore your vhosts using the
+\e[1m`restoreWebconfig`\e[0m and if needed the mysql database's using the \e[1m`restoreMysql`\e[0m command.
+\e[8m \e[0m
+\e[93m***NOTE*** Restoring the mysql databases should not normally be needed as they are located on a shared folder and\e[0m
+\e[93m should continue functioning as before.\e[0m

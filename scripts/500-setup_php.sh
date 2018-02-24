@@ -41,20 +41,6 @@ function setup_phpfarm() {
     cd /opt
     if [ ! -d /opt/phpfarm ]; then
         git clone https://github.com/DemacMedia/phpfarm.git phpfarm
-    else
-        # Patch old phpfarm options:
-        if [[ $(/opt/phpfarm/custom/options-5.4.sh | grep 'freetype')  == '' ]]; then
-            sed -i "s/--with-png-dir/--with-png-dir \\\\\n--with-freetype-dir=\/usr\/include\/freetype2 \\\\\n--enable-gd-native-ttf/" /opt/phpfarm/custom/options-5.4.sh
-        fi
-        if [[ $(/opt/phpfarm/custom/options-5.5.sh | grep 'freetype')  == '' ]]; then
-            sed -i "s/--with-png-dir/--with-png-dir \\\\\n--with-freetype-dir=\/usr\/include\/freetype2 \\\\\n--enable-gd-native-ttf/" /opt/phpfarm/custom/options-5.5.sh
-        fi
-        if [[ $(/opt/phpfarm/custom/options-5.6.sh | grep 'freetype')  == '' ]]; then
-            sed -i "s/--with-xsl/--with-xsl \\\\\n--with-freetype-dir=\/usr\/include\/freetype2 \\\\\n--enable-gd-native-ttf/" /opt/phpfarm/custom/options-5.6.sh
-        fi
-        if [[ $(/opt/phpfarm/custom/options-7.sh | grep 'freetype')  == '' ]]; then
-            sed -i "s/--with-xsl/--with-xsl \\\\\n--with-freetype-dir=\/usr\/include\/freetype2 \\\\\n--enable-gd-native-ttf/" /opt/phpfarm/custom/options-7.sh
-        fi
     fi
 }
 
@@ -69,6 +55,7 @@ function setup_php() {
     local phpv
     local phpn
     local phpp
+    local phpb
     local php_config_suffix_escaped
     local prefix
     local processes
@@ -121,6 +108,17 @@ function setup_php() {
         phpb=${arr[3]}
 
         if [ ! -f /opt/phpfarm/inst/php-${phpv}/bin/php ]; then
+            # Attempt to download from vagrant-lamp-assets repo if available
+            if [ ${phpb} == 'false' ] && [ ! -f /vagrant/files/php_builds/php-${phpv}.tar.gz ]; then
+                echo "Attempting to download php-${phpv}.tar.gz"
+                if [[ `wget -S -O /vagrant/files/php_builds/php-${phpv}.tar.gz https://github.com/DemacMedia/vagrant-lamp-assets/releases/download/v1.0/php-${phpv}.tar.gz  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then
+                    echo "Successfully downloaded php-${phpv}.tar.gz"
+                else
+                    rm -f /vagrant/files/php_builds/php-${phpv}.tar.gz
+                    echo "Error downloading php-${phpv}.tar.gz"
+                fi
+            fi
+
             if [ ${phpb} == 'true' ] || [ ! -f /vagrant/files/php_builds/php-${phpv}.tar.gz ] ; then
                 cd /opt/phpfarm/src
                 ./main.sh ${phpv}

@@ -57,8 +57,6 @@ specifically.
             destination: /srv/mysql
             type:
             create: true
-            owner: 500      # mysql user  not created yet, but will have this id when the box is provisioned
-            group: 500      # mysql group not created yet, but will have this id when the box is provisioned
 
           - local_path: ~/projects/backup
             destination: /srv/backup
@@ -77,6 +75,9 @@ specifically.
 -   Varnish 4
 -   Redis
 -   PHP-FPM 5.4, 5.5, 5.6, 7.0 & 7.1 /w Xdebug (via PHPFARM)
+-   ElasticSearch 2.4.6
+-   RabbitMq 3.5.7
+-   Solr 3.4.0, 3.5.0 & 3.6.2
 -   HTOP
 -   dos2unix
 -   smem
@@ -93,11 +94,15 @@ specifically.
 -   redis-setup
     - Add / Remove or List Redis instances
 
-        ```Usage: redis-setup add|remove|list -n name [-p port] [-s save]```
+        ```Usage: sudo redis-setup add|remove|list -n name [-p port] [-s save]```
 -   vhost
     - Add / Remove Apache virtualhost entries
 
-        ```Usage: vhost add|remove -d DocumentRoot -n ServerName -p PhpVersion [-a ServerAlias] [-s CertPath] [-c CertName] [-f]```
+        ```Usage: sudo vhost add|remove|list|sites -d DocumentRoot -n ServerName -p PhpVersion [-a ServerAlias] [-s CertPath] [-c CertName] [-f]```
+-   solr
+    - Add / Remove Solr core entries
+
+        ```Usage: sudo solr add|remove|list -n name [-v version]```
 -   mysql-sync
     - Sync Remote Database to VM Mysql instance
 

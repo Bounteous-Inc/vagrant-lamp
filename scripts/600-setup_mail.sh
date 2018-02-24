@@ -48,8 +48,8 @@ if [ ! -f /etc/apache2/sites-available/100-mailhog.demacmedia.com.conf ]; then
   ProxyPreserveHost On
   ProxyRequests Off
   ServerName mailhog.demacmedia.com
-  ProxyPass / http://192.168.33.10:8025/
-  ProxyPassReverse / http://192.168.33.10:8025/
+  ProxyPass / http://127.0.0.1:8025/
+  ProxyPassReverse / http://127.0.0.1:8025/
 </VirtualHost>
 EOL
 

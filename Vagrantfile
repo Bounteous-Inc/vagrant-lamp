@@ -1,7 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 mounts_required = Array.[]('/srv/www', '/srv/mysql', '/srv/backup')
-config_required = Array.[]('config_php', 'config_users', 'config_groups')
 
 # Use config.yml for basic VM configuration.
 require 'yaml'
@@ -30,20 +29,6 @@ mounts_required.each do |required_folder|
       'mapping to ' + mounts_required.to_s + "\n" +
       "Please see example.config.yml for details on how to set this.\n" +
       "\n"
-    exit
-  end
-end
-
-config_required.each do |required_config|
-  if !vconfig[required_config]
-    puts "\n" +
-    '**********************' + "\n" +
-    '* Demac Vagrant Lamp *' + "\n" +
-    '**********************' + "\n" +
-    'Your config.yml file must contain a ' +
-     required_config + ' element.' + "\n" +
-    "Please see example.config.yml for details on how to set this.\n" +
-    "\n"
     exit
   end
 end
@@ -106,12 +91,10 @@ Vagrant.configure(2) do |config|
       mount_options: synced_folder.include?('mount_options') ? synced_folder['mount_options'] : []
     }
 
-    owner = synced_folder['owner'] ? synced_folder['owner'] : 'vagrant'
-    group = synced_folder['group'] ? synced_folder['group'] : 'vagrant'
-
     if synced_folder['type'] != 'nfs' || Vagrant::Util::Platform.windows?
-       options[:owner] = owner
-       options[:group] = group
+       options[:owner] = 'vagrant'
+       options[:group] = 'vagrant'
+       options[:mount_options] = ["dmode=775,fmode=664"]
     end
 
     if synced_folder.include?('options_override')
@@ -134,26 +117,6 @@ Vagrant.configure(2) do |config|
     vb.cpus = vconfig['vagrant_cpus']
     vb.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
     vb.customize ['modifyvm', :id, '--ioapic', 'on']
-  end
-
-  # Create config_php.sh
-  config.vm.provision "shell", inline: "rm -f /vagrant/config_php.sh"
-  vconfig['config_php'].each do |config_php|
-    if config_php['enabled']
-      config.vm.provision :shell, :path => "scripts/build/config_php.sh", :args => ["#{config_php['version']}", "#{config_php['shortname']}", config_php['port'], "#{config_php['build']}"]
-    end
-  end
-
-  # Create config_users.sh
-  config.vm.provision "shell", inline: "rm -f /vagrant/config_users.sh"
-  vconfig['config_users'].each do |config_users|
-      config.vm.provision :shell, :path => "scripts/build/config_users.sh", :args => [config_users['uid'], config_users['gid'], config_users['name'], config_users['home'], config_users['shell'], config_users['comment']]
-  end
-
-  # Create config_groups.sh
-  config.vm.provision "shell", inline: "rm -f /vagrant/config_groups.sh"
-  vconfig['config_groups'].each do |config_groups|
-      config.vm.provision :shell, :path => "scripts/build/config_groups.sh", :args => [config_groups['gid'], config_groups['name']]
   end
 
   # Run all setup scripts in numbered order:
