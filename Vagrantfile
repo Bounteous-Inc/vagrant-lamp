@@ -126,13 +126,6 @@ Vagrant.configure(2) do |config|
     config.vm.provision provision_name, type: "shell", path: setup_script
   end
 
-  # Run optional software
-  vconfig['optional_software'].each do |optional_software, should_install|
-    if should_install
-      config.vm.provision optional_software, type: "shell", path: "#{dir}/scripts/optional/setup_#{optional_software}.sh"
-    end
-  end
-
   config.vm.define vconfig['vagrant_machine_name']
 
   # Make mysql's socket available to php - e.g.
