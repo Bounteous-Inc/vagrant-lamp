@@ -5,3 +5,4 @@
 /backup
 /mysql
 /config.yml
+/files/php_builds/*
