@@ -10,8 +10,8 @@ set -ex
 apt-get install -y redis-server 2>&1
 
 #setup redis script
-yes | cp -rf /vagrant/files/redis-setup.sh /usr/local/bin/redis-setup
-chmod +x /usr/local/bin/redis-setup
+yes | cp -rf /vagrant/files/redis.sh /usr/local/bin/redis
+chmod +x /usr/local/bin/redis
 
 if [ ! -f /etc/redis/redis-default.conf ]; then
     cp /vagrant/files/redis-default.conf /etc/redis/redis-default.conf

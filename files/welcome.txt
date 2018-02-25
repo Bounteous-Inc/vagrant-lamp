@@ -42,6 +42,8 @@ The following functions and aliases are available:
   restoreWebconfig  - Restores all of your VHost configuration settings and SSL certificates from /srv/backup
                       This is shared on your host machine so will survive a \e[33mvagrant destroy\e[0;32m
   vhost             - Use this to add, remove or list vhosts, or to see a simple list of sites available
+  solr              - Use this to add, remove or list cores to solr
+  redis             - Use this to add  remove or list redis instances
   www               - Switches you to the /srv/www directory
 
   The following websites are set up in this environment - use \e[33mvhost sites\e[0;32m to see this list again

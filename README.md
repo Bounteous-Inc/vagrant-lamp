@@ -91,10 +91,10 @@ specifically.
 -   N98-Magerun and N98-Magerun2
 -   modman
 -   PHPUnit
--   redis-setup
+-   redis
     - Add / Remove or List Redis instances
 
-        ```Usage: sudo redis-setup add|remove|list -n name [-p port] [-s save]```
+        ```Usage: sudo redis add|remove|list -n name [-p port] [-s save]```
 -   vhost
     - Add / Remove Apache virtualhost entries
 
