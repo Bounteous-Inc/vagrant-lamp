@@ -97,7 +97,7 @@ Vagrant.configure(2) do |config|
     if synced_folder['type'] != 'nfs' || Vagrant::Util::Platform.windows?
        options[:owner] = owner
        options[:group] = group
-       options[:mount_options] = ["dmode=775,fmode=664"]
+       options[:mount_options] = ["dmode=775,fmode=775"]
     end
 
     if synced_folder.include?('options_override')
