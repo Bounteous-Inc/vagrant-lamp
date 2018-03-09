@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.0.13](https://github.com/demacmedia/vagrant-lamp/tree/1.0.13) (2018-03-09)
+[Full Changelog](https://github.com/demacmedia/vagrant-lamp/compare/1.0.12...1.0.13)
+
+    - Fixed error when `plugin.index("(")` returns `nil`
+    - Removed unnecessary pre-definition of users and groups other than mysql
+
 ## [1.0.12](https://github.com/demacmedia/vagrant-lamp/tree/1.0.12) (2018-02-17)
 [Full Changelog](https://github.com/demacmedia/vagrant-lamp/compare/1.0.11...1.0.12)
 
