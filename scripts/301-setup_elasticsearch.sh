@@ -17,7 +17,7 @@ if [ ! -f /etc/elasticsearch/elasticsearch.yml ]; then
     dpkg -i elasticsearch-2.4.6.deb
 
     # Start on boot
-    update-rc.d elasticsearch defaults 95 10
+    sudo systemctl enable elasticsearch.service
     service elasticsearch start
 fi
 
