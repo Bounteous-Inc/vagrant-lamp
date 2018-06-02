@@ -31,6 +31,7 @@ The following functions and aliases are available:
 
 \e[1mPHP:\e[0;32m
   phpRestart        - restarts all installed PHP FPM services
+  phpErrors 0|1     - Enables / Disables display_errors and display_startup_errors for all installed PHP versions
   xdebug 0|1        - Enables / Disables xdebug for all installed PHP versions (switching off saves time and memory)
 
   The following PHP versions are available with this release and may be invoked in shell via their aliases:
